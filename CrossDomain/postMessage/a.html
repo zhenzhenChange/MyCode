@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A</title>
+  </head>
+  <body>
+    <iframe src="http://localhost:5000/b.html" id="aFrame"></iframe>
+    <script>
+      var frame = document.getElementById("aFrame");
+      frame.onload = function() {
+        frame.contentWindow.postMessage("222", "http://localhost:5000");
+        window.onmessage = function(e) {
+          console.log("a " + e.data);
+        };
+      };
+    </script>
+  </body>
+</html>

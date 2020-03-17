@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>B</title>
+  </head>
+  <body>
+    <script>
+      window.onmessage = function(e) {
+        console.log("B " + e.data);
+        e.source.postMessage("我不好", e.origin);
+      };
+    </script>
+  </body>
+</html>

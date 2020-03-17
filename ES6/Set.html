@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const A = new Set([1, 2, 4, 5, 6]);
+      const B = new Set([2, 4, 6, 7]);
+
+      /* 取并集 */
+      // 1.转化成数组
+      // 2.两个集合合并成一个数组
+      // 3.利用Set集合值的唯一性
+      const C = new Set([...A, ...B]);
+
+      /* 取交集 */
+      // 1.转化成数组
+      // 2.返回在B中也拥有的
+      const D = [...A].filter(item => B.has(item));
+
+      /* 取差集 */
+      // 1.转化成数组
+      // 2.返回在B中没有的
+      const E = [...A].filter(item => !B.has(item));
+
+      /* Set 集合，当引用类型释放后，它依旧引用，WeakSet（只能存储引用类型）则会解除引用 */
+      let obj = { name: "zhenzhen" };
+      let newObj = obj;
+
+      const set = new Set();
+      const wSet = new WeakSet(null);
+
+      /* 添加在打印之后，依旧能打印出来 */
+      set.add(obj);
+      set.add(newObj);
+
+      /* 只会存在一个，在Set集合中，两个NaN被视为同一个 */
+      set.add(NaN);
+      set.add(NaN);
+
+      /* +0 -0 也会被视为同一个 */
+      set.add(+0);
+      set.add(-0);
+
+      set.add(undefined);
+      console.log(set);
+      console.log(set.size);
+
+      wSet.add(obj);
+      wSet.add(newObj);
+
+      newObj = null;
+      obj = null;
+
+      wSet.delete(newObj);
+
+      // 对 传入的subject对象 内部存储的所有内容执行回调
+      function execRecursively(fn, subject, _refs = null) {
+        if (!_refs) _refs = new WeakSet();
+
+        // 避免无限递归，检测当前对象是否已存在集合中
+        if (_refs.has(subject)) return;
+
+        fn(subject);
+        if ("object" === typeof subject) {
+          _refs.add(subject);
+          for (let key in subject) execRecursively(fn, subject[key], _refs);
+        }
+      }
+
+      const foo = {
+        foo: "Foo",
+        bar: {
+          bar: "Bar",
+        },
+      };
+
+      foo.bar.baz = foo; // 循环引用!
+      // execRecursively(obj => console.log(obj), foo);
+
+      const ddd = new Set([...A, ...B]);
+      ddd["addd"] = "231";
+      console.log(ddd);
+    </script>
+  </body>
+</html>

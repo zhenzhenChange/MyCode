@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSONP实现跨域</title>
+  </head>
+  <body>
+    <script>
+      /*
+       * 缺点:
+       * 1.只支持Get请求
+       * 2.不安全，容易遭受xss攻击
+       */
+      function jsonp({ url, params, cb }) {
+        // => 1.返回一个Promise
+        return new Promise((resolve, reject) => {
+          // => 2.创建script标签
+          const script = document.createElement("script");
+
+          // => 3.给全局对象添加一个属性，值为一个回调函数，并且把返回的数据resolve出去
+          window[cb] = function(data) {
+            resolve(data);
+
+            // => 4.用完即删
+            document.body.removeChild(script);
+          };
+
+          // => 5.整合参数
+          params = { ...params, cb };
+          const arr = [];
+          for (const key in params) {
+            arr.push(`${key}=${params[key]}`);
+          }
+
+          // => 6.拼接URL
+          script.src = `${url}?${arr.join("&")}`;
+
+          // => 7.将script添加到页面实现跨域请求
+          document.body.appendChild(script);
+        });
+      }
+
+      jsonp({
+        url: "http://localhost:3344/jsonp",
+        params: { msg: "Hello" },
+        cb: "cross",
+      }).then(data => console.log(data));
+    </script>
+  </body>
+</html>

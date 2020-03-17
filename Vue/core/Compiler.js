@@ -85,6 +85,10 @@ class Compiler {
         });
         // 判断是否为插值文本 {{ xxx }}
       } else if (this.isInterpolation(node)) {
+        /* const reg = /\{\{(.+?)\}\}/g;
+        node.textContent.replace(reg, (_, $) => {
+          this.update(node, this.$vm, $.trim(), "text");
+        }); */
         /*
          * 编译文本，正则捕获组去空格 /\{\{(.*)\}\}/g $1则是 .* 部分
          * 如：{{ name }}
