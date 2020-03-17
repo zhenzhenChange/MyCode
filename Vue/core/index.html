@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>{{ name }}</h1>
+      <h2 z-text="name"></h2>
+      <h3>{{ age }}</h3>
+      <h4>{{ desc }}</h4>
+      <input type="text" z-model="name" />
+      <button @click="changeName">Click</button>
+      <div z-html="html"></div>
+    </div>
+    <script src="./Compiler.js"></script>
+    <script src="./zhenVue.js"></script>
+    <script>
+      new ZhenVue({
+        el: "#app",
+        data() {
+          return {
+            name: "zhen",
+            age: 20,
+            desc: "JavaScript",
+            html: "<h1>你好啊</h1>",
+            obj: {
+              aa: 1,
+            },
+          };
+        },
+        created() {
+          console.log("Start");
+          setTimeout(() => {
+            this.name = "xiaozhenzhen";
+          }, 1000);
+        },
+        methods: {
+          changeName() {
+            this.name = "Hello zhenzhen";
+            this.age++;
+            this.html = "<h3>你好啊</h3>";
+          },
+        },
+      });
+    </script>
+  </body>
+</html>
