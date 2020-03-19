@@ -166,6 +166,14 @@ class MyPromise {
   }
 
   finally(callback) {
+    /* const P = this.constructor;
+    return this.then(
+      value => P.resolve(callback()).then(() => value),
+      reason =>
+        P.resolve(callback()).then(() => {
+          throw reason;
+        }),
+    ); */
     return this.then(
       value => {
         callback();

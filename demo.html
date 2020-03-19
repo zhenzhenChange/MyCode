@@ -7,46 +7,19 @@
   </head>
   <body>
     <script>
-      console.log(1); // => step1
+      const p1 = new Promise((resolve, reject) => {
+        resolve("hello");
+      })
+        .then(result => result)
+        .catch(e => e);
 
-      setTimeout(() => {
-        console.log(2); // => step10
-      }, 1000); // => 添加到宏任务：T1
+      const p2 = new Promise((resolve, reject) => {
+        throw new Error("报错了");
+      }).then(result => result);
 
-      async function fn() {
-        console.log(3); // => step3
-
-        setTimeout(() => {
-          console.log(4); // => step6
-        }, 20); // => 添加到宏任务：T2
-
-        return Promise.resolve(); // => 静态方法，直接reject态
-      }
-
-      async function run() {
-        console.log(5); // => step2
-        await fn(); // => fn()先执行后，这个await添加到微任务：M1
-        console.log(6); // => 此处由于上一个Promise处于失败态，所以不会执行
-      }
-
-      run();
-
-      // 需要执行150ms左右 => 接着到这(step3后)，当循环完毕的，T2就绪执行。T1还要好久
-      for (let i = 0; i < 90000000; i++) {}
-
-      setTimeout(() => {
-        console.log(7); // => step7
-
-        new Promise(resolve => {
-          console.log(8); // => step8
-
-          resolve(); // => 微任务：M2
-        }).then(() => {
-          console.log(9); // => step9
-        });
-      }, 0); // => 添加到宏任务：T3
-
-      console.log(10); // => step4
+      Promise.all([p1, p2])
+        .then(result => console.log(result))
+        .catch(e => console.log(e));
     </script>
   </body>
 </html>

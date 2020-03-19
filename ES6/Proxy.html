@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      /* "use strict";
+      const handler = {
+        set: function(obj, prop, value, receiver) {
+          obj[prop] = receiver;
+          // 严格模式下 无论有没有下面这一行，都会报错
+          return false;
+        },
+      };
+      const proxy44 = new Proxy({}, handler);
+      proxy44.foo = "bar"; */
+
+      const person = { name: "zhenzhen", age: 22 };
+      const proxy = new Proxy(person, {
+        /* ctx 表示调用了读取操作的那个对象（this、上下文） */
+        get(target, key, ctx) {
+          /* 若属性存在，则返回这个属性值，若不存在，则返回undefined */
+          if (Reflect.has(target, key)) {
+            return Reflect.get(target, key);
+            /* 若不存在可定制处理（抛出错误） */
+          } else {
+            throw new ReferenceError("没有该属性");
+          }
+        },
+      });
+      /* 可传入proxy作为新对象的原型，新对象可继承proxy一系列拦截 */
+      const extendObj = Object.create(proxy);
+
+      /* 链式操作 */
+      /* var pipe = function(value) {
+        var funcStack = [];
+        var oproxy = new Proxy(
+          {},
+          {
+            get: function(pipeObject, fnName) {
+              if (fnName === "get") {
+                return funcStack.reduce(function(val, fn) {
+                  return fn(val);
+                }, value);
+              }
+              funcStack.push(window[fnName]);
+              return oproxy;
+            },
+          },
+        );
+
+        return oproxy;
+      };
+
+      var double = n => n * 2;
+      var pow = n => n * n;
+      var reverseInt = n =>
+        n
+          .toString()
+          .split("")
+          .reverse()
+          .join("") | 0;
+
+      pipe(3).double.pow.reverseInt.get; */
+      /* const dom = new Proxy(
+        {},
+        {
+          get(target, property) {
+            return function(attrs = {}, ...children) {
+              const el = document.createElement(property);
+              for (let prop of Object.keys(attrs)) {
+                el.setAttribute(prop, attrs[prop]);
+              }
+              for (let child of children) {
+                if (typeof child === "string") {
+                  child = document.createTextNode(child);
+                }
+                el.appendChild(child);
+              }
+              return el;
+            };
+          },
+        },
+      );
+
+      const el = dom.div(
+        {},
+        "Hello, my name is ",
+        dom.a({ href: "//example.com" }, "Mark"),
+        ". I like:",
+        dom.ul({}, dom.li({}, "The web"), dom.li({}, "Food"), dom.li({}, "…actually that's it")),
+      );
+
+      document.body.appendChild(el); */
+
+      const proxy2 = new Proxy(
+        {},
+        {
+          get: function(target, key, receiver) {
+            return receiver;
+          },
+        },
+      );
+
+      // 进行读取操作时，返回调用了读取操作的上下文，也就是自身
+      // console.log(proxy2.a === proxy2); // => true
+      const d = Object.create(proxy2);
+      // console.log(d.a === d); // => true
+    </script>
+  </body>
+</html>

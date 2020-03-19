@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -81,9 +81,15 @@
       foo.bar.baz = foo; // 循环引用!
       // execRecursively(obj => console.log(obj), foo);
 
-      const ddd = new Set([...A, ...B]);
-      ddd["addd"] = "231";
-      console.log(ddd);
+      /* 可以给set添加属性，但这个属性不在集合呢 */
+      const property = new Set([...A, ...B]);
+      property["addPro"] = "231";
+
+      /* 字符串去重 */
+      const strSet = new Set("dsay14efag213321fadsafsa");
+      const newStr = [...strSet].join("");
+      console.log(strSet);
+      console.log(newStr);
     </script>
   </body>
 </html>

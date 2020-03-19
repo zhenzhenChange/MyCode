@@ -1,28 +1,696 @@
-# 手写实现JavaScript中的方法、函数、关键字
-
-
+# 模拟实现 JavaScript 中常用的方法、函数、关键字、有趣的玩意
 
 ## new
 
-
-
 ## apply
-
-
 
 ## call
 
-
-
 ## bind
 
+## instanceof
 
+## Promise
+
+```javascript
+// 状态值：pending、fulfilled、rejected
+const PENDING = "pending"; // => 等待态
+const FULFILLED = "fulfilled"; // => 成功态
+const REJECTED = "rejected"; // => 失败态
+
+const ERROR = "不能返回Promise本身，否则会造成循环引用，无限递归";
+
+const resolvePromise = (newPromise, x, resolve, reject) => {
+  // 判断是否为同一个，不能返回Promise本身，否则会造成循环引用，无限递归
+  if (newPromise === x) return reject(new TypeError(ERROR));
+
+  if ((typeof x === "object" && x !== null) || typeof x === "function") {
+    let called;
+
+    try {
+      const then = x.then;
+
+      if (typeof then === "function") {
+        then.call(
+          x,
+          y => {
+            if (called) return;
+            called = true;
+
+            resolvePromise(newPromise, y, resolve, reject);
+          },
+          r => {
+            if (called) return;
+            called = true;
+
+            reject(r);
+          },
+        );
+      } else {
+        resolve(x);
+      }
+    } catch (e) {
+      if (called) return;
+      called = true;
+
+      reject(e);
+    }
+  } else {
+    resolve(x);
+  }
+};
+
+const isPromise = x => {
+  if ((typeof x === "object" && x !== null) || typeof x === "function") {
+    return typeof x.then === "function";
+  }
+  return false;
+};
+
+class MyPromise {
+  constructor(executor) {
+    // 状态，默认为 pending
+    this.status = PENDING;
+
+    // 成功的结果
+    this.value = undefined;
+
+    // 失败的原因
+    this.reason = undefined;
+
+    // 成功的池子
+    this.resolveArray = [];
+
+    // 失败的池子
+    this.rejectArray = [];
+
+    // 成功的回调
+    const resolve = value => {
+      if (this.status === PENDING) {
+        this.status = FULFILLED;
+        this.value = value;
+
+        // 发布
+        this.resolveArray.forEach(fn => fn());
+      }
+    };
+
+    // 失败的回调
+    const reject = reason => {
+      if (this.status === PENDING) {
+        this.status = REJECTED;
+        this.reason = reason;
+
+        // 发布
+        this.rejectArray.forEach(fn => fn());
+      }
+    };
+
+    try {
+      // 立即执行
+      executor(resolve, reject);
+    } catch (e) {
+      // 异常则执行错误的回调
+      reject(e);
+    }
+  }
+
+  then(onFulfilled, onRejected) {
+    onFulfilled = typeof onFulfilled === "function" ? onFulfilled : val => val;
+    onRejected =
+      typeof onRejected === "function"
+        ? onRejected
+        : val => {
+            throw val;
+          };
+
+    const newPromise = new MyPromise((resolve, reject) => {
+      if (this.status === FULFILLED) {
+        setTimeout(() => {
+          try {
+            const x = onFulfilled(this.value);
+            resolvePromise(newPromise, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        }, 0);
+      }
+
+      if (this.status === REJECTED) {
+        setTimeout(() => {
+          try {
+            const x = onRejected(this.reason);
+            resolvePromise(newPromise, x, resolve, reject);
+          } catch (e) {
+            reject(e);
+          }
+        }, 0);
+      }
+
+      // 订阅
+      if (this.status === PENDING) {
+        this.resolveArray.push(() => {
+          setTimeout(() => {
+            try {
+              const x = onFulfilled(this.value);
+              resolvePromise(newPromise, x, resolve, reject);
+            } catch (e) {
+              reject(e);
+            }
+          }, 0);
+        });
+
+        this.rejectArray.push(() => {
+          setTimeout(() => {
+            try {
+              const x = onRejected(this.reason);
+              resolvePromise(newPromise, x, resolve, reject);
+            } catch (e) {
+              reject(e);
+            }
+          }, 0);
+        });
+      }
+    });
+
+    return newPromise;
+  }
+
+  catch(onRejected) {
+    return this.then(null, onRejected);
+  }
+
+  finally(callback) {
+    /* const P = this.constructor;
+    return this.then(
+      value => P.resolve(callback()).then(() => value),
+      reason =>
+        P.resolve(callback()).then(() => {
+          throw reason;
+        }),
+    ); */
+    return this.then(
+      value => {
+        callback();
+        return value;
+      },
+      reason => {
+        callback();
+        return reason;
+      },
+    );
+  }
+
+  // TODO ...
+  /*
+   * 该Promise.allSettled()方法返回一个在所有给定的promise已被决议或被拒绝后决议的promise，并带有一个对象数组，每个对象表示对应的promise结果。
+   * 它当前处于 TC39 第四阶段草案（Stage 4）
+   */
+  allSettled() {}
+
+  static promisify(fn) {
+    return (...args) =>
+      new MyPromise((resolve, reject) => {
+        fn(...args, (err, data) => {
+          if (err) reject();
+          resolve(data);
+        });
+      });
+  }
+
+  // TODO...
+  /*
+   * Promise.any() 接收一个Promise可迭代对象，只要其中的一个 promise 完成，就返回那个已经有完成值的 promise 。
+   * 如果可迭代对象中没有一个 promise 完成（即所有的 promises 都失败/拒绝），就返回一个拒绝的 promise，返回值还有待讨论：
+   * 无非是拒绝原因数组或AggregateError类型的实例，它是 Error 的一个子类，用于把单一的错误集合在一起。
+   * 本质上，这个方法和Promise.all()是相反的。
+   *
+   * 注意！ Promise.any() 方法依然是实验性的，尚未被所有的浏览器完全支持。它当前处于 TC39 第三阶段草案（Stage 3）
+   */
+  static any() {}
+
+  static all(promises) {
+    if (!Array.isArray(promises)) throw new TypeError("Iterable Is Not Array");
+    return new MyPromise((resolve, reject) => {
+      const results = [];
+      let count = 0;
+
+      const processData = (i, data) => {
+        results[i] = data;
+        if (++count === promises.length) {
+          resolve(results);
+        }
+      };
+
+      promises.forEach((promise, index) => {
+        let item = promises[index];
+        if (isPromise(item)) {
+          promise.then(data => {
+            processData(index, data);
+          }, reject);
+        } else {
+          processData(index, item);
+        }
+      });
+    });
+  }
+
+  static race(promises) {
+    if (!Array.isArray(promises)) throw new TypeError("Iterable Is Not Array");
+    return new MyPromise((resolve, reject) => {
+      promises.forEach(promise => {
+        promise.then(resolve, reject);
+      });
+    });
+  }
+
+  static resolve(value) {
+    return new MyPromise((resolve, reject) => {
+      if (isPromise(value)) {
+        return value.then(resolve, reject);
+      } else {
+        resolve(value);
+      }
+    });
+  }
+
+  static reject(reason) {
+    return new MyPromise((resolve, reject) => {
+      if (isPromise(reason)) {
+        return reason.then(resolve, reject);
+      } else {
+        reject(reason);
+      }
+    });
+  }
+}
+
+/* 单元测试 */
+MyPromise.deferred = function() {
+  let dfd = {};
+  dfd.promise = new MyPromise((resolve, reject) => {
+    dfd.resolve = resolve;
+    dfd.reject = reject;
+  });
+  return dfd;
+};
+
+module.exports = MyPromise;
+```
+
+## 数组扁平化
+
+```javascript
+/* 数组扁平化（平铺） */
+let arr = [[1, 2, 2], [2, 33, 4, 5, 4], [2, 34, 5, [11, 22, [22, 33, [42]]]], 12];
+
+/* --------------------------------------------- */
+
+/* Flat */
+const newArr = arr.flat(Infinity);
+
+/* --------------------------------------------- */
+
+/* 转换为字符串 */
+const newBrr = arr
+  .toString()
+  .split(",")
+  .map(item => Number(item));
+
+const newCrr = JSON.stringify(arr)
+  .replace(/(\[|\])/g, "")
+  .split(",")
+  .map(item => Number(item));
+
+/* --------------------------------------------- */
+
+/* 循环判断是否为数组 */
+while (arr.some(item => Array.isArray(item))) {
+  arr = [].concat(...arr);
+}
+
+/* --------------------------------------------- */
+
+function myFlat() {
+  const newArr = [];
+  const fn = arr => {
+    for (let i = 0; i < arr.length; i++) {
+      if (Array.isArray(arr[i])) {
+        fn(arr[i]);
+        continue;
+      }
+      newArr.push(arr[i]);
+    }
+  };
+  fn(this);
+  return newArr;
+}
+Array.prototype.myFlat = myFlat;
+
+/* --------------------------------------------- */
+```
+
+## Array.reduce
+
+## Ajax
+
+## 防抖
+
+## 节流
+
+## 原型链继承
+
+## 通用类型检测
+
+```javascript
+/* Object.prototype.toString.call() 形式 */
+const typeGather = Object.create(null);
+const typeFuncs = Object.create(null);
+const toString = Object.prototype.toString;
+
+/* 原始类型 */
+Reflect.set(typeGather, "isNull", "Null");
+Reflect.set(typeGather, "isNumber", "Number");
+Reflect.set(typeGather, "isString", "String");
+Reflect.set(typeGather, "isSymbol", "Symbol");
+Reflect.set(typeGather, "isBoolean", "Boolean");
+Reflect.set(typeGather, "isUndefined", "Undefined");
+
+/* 内置对象 or 引用类型 */
+Reflect.set(typeGather, "isSet", "Set");
+Reflect.set(typeGather, "isMap", "Map");
+Reflect.set(typeGather, "isMath", "Math");
+Reflect.set(typeGather, "isJSON", "JSON");
+Reflect.set(typeGather, "isDate", "Date");
+Reflect.set(typeGather, "isError", "Error");
+Reflect.set(typeGather, "isArray", "Array");
+Reflect.set(typeGather, "isRegExp", "RegExp");
+Reflect.set(typeGather, "isWindow", "Window");
+Reflect.set(typeGather, "isObject", "Object");
+Reflect.set(typeGather, "isFunction", "Function");
+
+/* 遍历生成方法 */
+Reflect.ownKeys(typeGather).forEach(key => {
+  typeFuncs[key] = val => toString.call(val) === `[object ${Reflect.get(typeGather, key)}]`;
+});
+
+console.log(typeFuncs.isNull(null)); // => "[object Null]"
+console.log(typeFuncs.isNumber(123)); // => "[object Number]"
+console.log(typeFuncs.isNumber(NaN)); // => "[object Number]"
+console.log(typeFuncs.isString("str")); // => "[object String]"
+console.log(typeFuncs.isBoolean(true)); // => "[object Boolean]"
+console.log(typeFuncs.isUndefined(undefined)); // => "[object Undefined]"
+console.log(typeFuncs.isSymbol(Symbol("Symbol"))); // => "[object Symbol]"
+
+console.log(typeFuncs.isDate(new Date())); // => "[object Date]"
+console.log(typeFuncs.isRegExp(/^hello/)); // => "[object RegExp]"
+console.log(typeFuncs.isArray(["/^hello/"])); // => "[object Array]"
+console.log(typeFuncs.isFunction(Window)); // => "[object Function]"
+console.log(typeFuncs.isFunction(() => {})); // => "[object Function]"
+console.log(typeFuncs.isFunction(function() {})); // => "[object Function]"
+console.log(typeFuncs.isObject({ name: "zhenzhen" })); // => "[object Object]"
+
+console.log(typeFuncs.isMath(Math)); // => "[object Math]"
+console.log(typeFuncs.isSet(new Set())); // => "[object Set]"
+console.log(typeFuncs.isMap(new Map())); // => "[object Map]"
+console.log(typeFuncs.isWindow(this)); // => "[object Window]"
+console.log(typeFuncs.isWindow(window)); // => "[object Window]"
+console.log(typeFuncs.isJSON(JSON)); // => "[object JSON]"
+console.log(typeFuncs.isError(new Error())); // => "[object Error]"
+
+/* 柯里化形式 */
+```
+
+## JSONP
+
+```javascript
+/* 后端服务 */
+const express = require("./node_modules/express");
+const app = express();
+
+app.get("/jsonp", (req, res) => {
+  const { msg, cb } = req.query;
+  console.log(msg);
+  console.log(cb);
+  res.end(`${cb}({msg:'Yes'})`);
+});
+
+app.listen(3344);
+```
+
+```javascript
+/* 前端实现 */
+/*
+ * 缺点:
+ * 1.只支持Get请求
+ * 2.不安全，容易遭受xss攻击
+ */
+function jsonp({ url, params, cb }) {
+  // => 1.返回一个Promise
+  return new Promise((resolve, reject) => {
+    // => 2.创建script标签
+    const script = document.createElement("script");
+
+    // => 3.给全局对象添加一个属性，值为一个回调函数，并且把返回的数据resolve出去
+    window[cb] = function(data) {
+      resolve(data);
+
+      // => 4.用完即删
+      document.body.removeChild(script);
+    };
+
+    // => 5.整合参数
+    params = { ...params, cb };
+    const arr = [];
+    for (const key in params) {
+      arr.push(`${key}=${params[key]}`);
+    }
+
+    // => 6.拼接URL
+    script.src = `${url}?${arr.join("&")}`;
+
+    // => 7.将script添加到页面实现跨域请求
+    document.body.appendChild(script);
+  });
+}
+
+jsonp({
+  url: "http://localhost:3344/jsonp",
+  params: { msg: "Hello" },
+  cb: "cross",
+}).then(data => console.log(data));
+```
+
+## isNaN
+
+## Array.push
+
+## 数组去重
+
+```javascript
+/* 数组去重 */
+let arr = [12, 23, 12, 15, 25, 23, 25, 14, 16];
+let len = arr.length;
+
+/* --------------------------------------------- */
+
+/* Set 利用Set集合的特性 */
+let newArr = [...new Set(arr)];
+let newBrr = Array.from(new Set(arr));
+
+/* --------------------------------------------- */
+
+/* For 双重for循环 */
+for (let i = 0; i < len; i++) {
+  for (let j = i + 1; j < len; j++) {
+    if (arr[i] === arr[j]) {
+      arr.splice(i, 1); // 需减一，否则造成数组塌陷
+      j--;
+    }
+  }
+}
+
+/* --------------------------------------------- */
+
+/* Object 利用对象中属性的唯一性 */
+let objArr = {};
+const newDrr = [];
+
+for (let i = 0; i < len; i++) {
+  const item = arr[i];
+  objArr[item] = item;
+}
+
+for (const key in objArr) {
+  newDrr.push(objArr[key]);
+}
+
+objArr = null;
+
+/* --------------------------------------------- */
+
+/* RegExp 正则匹配方式 相邻项 */
+const newErr = [];
+
+// 升序排序
+arr.sort((a, b) => a - b);
+
+// 拆分数组并且每项后面拼接一个字符串
+const strArr = arr.join("@") + "@";
+
+// 正则：以数字开头+@符结尾，捕获0 - N 次
+const reg = /(\d+@)\1*/g;
+
+// 替换
+strArr.replace(reg, (whole, part) => {
+  newErr.push(parseFloat(part));
+});
+
+/* --------------------------------------------- */
+```
+
+## 克隆
+
+```javascript
+var obj = {
+  a: 100,
+  b: [10, 20, 30],
+  c: { x: 111 },
+  d: /^\d+$/,
+  e: function() {
+    console.log(1);
+  },
+};
+
+var arr = [10, [100, 200], { x: 10, y: 20 }];
+
+// 浅克隆，但会忽略null、函数、正则、日期
+var cloneObj = JSON.parse(JSON.stringify(obj));
+
+// 浅克隆，引用类型的数据仍然指向的是同一个
+var newObj = {};
+for (const key in obj) {
+  if (obj.hasOwnProperty(key)) {
+    newObj[key] = obj[key];
+  }
+}
+newObj.c.x = 222; // => obj.c.x 也变成了222
+
+/* 深克隆 */
+function clone(data, deep) {
+  var copy = new data.constructor();
+  if (deep) {
+    if (data === null) return null;
+    if (typeof data !== "object") return data;
+    if (data instanceof RegExp) return new RegExp(data);
+    if (data instanceof Date) return new Date(data);
+    for (const key in data) {
+      if (data.hasOwnProperty(key)) {
+        copy[key] = clone(data[key], deep);
+      }
+    }
+  }
+  return copy;
+}
+```
+
+## 回文数
+
+## 懒加载
+
+## 数组排序（冒泡排序、插入排序、快速排序、选择排序（待实现））
+
+```javascript
+/* 数组排序 */
+let arr = [12, 23, 12, 15, 1, 25, 23, 25, 14, 16];
+
+/* --------------------------------------------- */
+
+/* 冒泡排序 */
+function bubbleSort(array) {
+  let temp;
+  const len = array.length;
+
+  // len - 1 排序的最大轮数
+  for (let i = 0; i < len - 1; i++) {
+    // len - 1 - i 减去已排序的轮数
+    for (let j = 0; j < len - 1 - i; j++) {
+      if (array[j] > array[j + 1]) {
+        temp = array[j];
+        array[j] = array[j + 1];
+        array[j + 1] = temp;
+      }
+    }
+  }
+  return array;
+}
+
+/* --------------------------------------------- */
+
+/* 插入排序 */
+function insertionSort(array) {
+  // 新建容器
+  const newArr = [];
+
+  // 先取第一项
+  newArr.push(array[0]);
+
+  // 从第二项开始取
+  for (let i = 1; i < array.length; i++) {
+    // 从新容器的末尾开始比较
+    for (let j = newArr.length - 1; j >= 0; j--) {
+      // 如果原数组中取出的项大于新容器中取出的项
+      if (array[i] > newArr[j]) {
+        // 在新容器的当前项的下一个位置插入原数组中取出的当前项
+        newArr.splice(j + 1, 0, array[i]);
+
+        // 结束本层循环，并跳到外层循环进行下一轮循环
+        break;
+      }
+
+      // 如果以上规则不符合，则匹配到了第一项，在第一个位置插入
+      if (j === 0) {
+        newArr.unshift(array[i]);
+      }
+    }
+  }
+
+  return newArr;
+}
+
+/* --------------------------------------------- */
+
+/* 快速排序 */
+function quickSort(array) {
+  // 如果数组长度小于等于1，结束递归
+  if (array.length <= 1) return array;
+
+  // 取出数组中间项
+  const midIndex = Math.floor(array.length / 2);
+  const midValue = array.splice(midIndex, 1)[0];
+
+  // 创建左右两个数组
+  const leftArr = [];
+  const rightArr = [];
+
+  for (let i = 0; i < array.length; i++) {
+    const item = array[i];
+    // 如果当前项小于数组中间项，则放在左数组，否则放在右数组
+    item < midValue ? leftArr.push(item) : rightArr.push(item);
+  }
+
+  // 递归处理左右数组，并且按照左中右的方式连接返回的数组
+  return quickSort(leftArr).concat(midValue, quickSort(rightArr));
+}
+
+/* --------------------------------------------- */
+```
+
+## JSON 序列化反序列化
 
 ## 一键粘贴功能：使用事件（onselet、oncopy、oncut、onpaste）
 
-
-
-
+## 阿里巴巴测评题
 
 ```javascript
 /**
@@ -233,6 +901,4 @@ function depthArray2Tree(depthArray: Array<any>): Array<any> {
 
   return newArr;
 }
-
 ```
-

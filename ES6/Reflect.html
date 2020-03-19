@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      const obj = {
+        name: "123",
+        age2: { a: 2 },
+        get bar() {
+          return this.foo;
+        },
+        set newName(val) {
+          this.name = val;
+        },
+      };
+
+      /* 报错  Object.defineProperty called on non-object */
+      try {
+        Object.defineProperty(1, "age", { value: 22 });
+      } catch (error) {}
+
+      /* 给对象定义默认行为，返回布尔值 */
+      Reflect.defineProperty(obj, "age", { value: 22 }); // => true
+
+      /* 获取对象中的属性值，若没有该属性则返回undefined */
+      Reflect.get(obj, "age22"); // => undefined
+
+      /* 若该属性指定了getter，则可指定上下文 */
+      Reflect.get(obj, "bar", { foo: 3 }); // => 3
+
+      /* 如果第一个参数不是对象，报错 Reflect.get called on non-object */
+      // Reflect.get(1, "2"); // => TypeError
+
+      /* 给对象添加属性，返回布尔值，如果设置了setter，则触发，且可以指定上下文 */
+      Reflect.set(obj, "newName", 3);
+
+      const newObj = { name: "zhenzhen" };
+      Reflect.set(obj, "newName", "hao", newObj);
+
+      let p = { a: "a" };
+
+      /* let handler = {
+        set(target, key, value, receiver) {
+          console.log("set");
+          Reflect.set(target, key, value, receiver);
+        },
+        defineProperty(target, key, attribute) {
+          console.log("defineProperty");
+          Reflect.defineProperty(target, key, attribute);
+        },
+      };
+
+      let ooo = new Proxy(p, handler);
+      ooo.a = "A"; */
+
+      /* 返回布尔值，检查对象中是否传入的属性 */
+      // "name" in obj;
+      Reflect.has(obj, "name");
+
+      /* 返回布尔值，删除对象中的属性，若属性不存在也返回true */
+      Reflect.deleteProperty(obj, "222");
+
+      function Person(name) {
+        this.name = name;
+      }
+      const po = new Person("hao");
+
+      /* 等价于new构造函数，第二个参数为函数传参数对象 */
+      const instance = Reflect.construct(Person, ["zhen"]);
+
+      /* 获取对象的原型，参数必须是对象，返回一个对象 */
+      Reflect.getPrototypeOf(obj);
+
+      /* 给对象设置原型，两个参数必须是对象，第一个参数不能为null */
+      Reflect.setPrototypeOf(obj, null);
+
+      Reflect.apply(Person, { obj: 22 }, ["21312"]);
+
+      /* 获取属性的特性描述 */
+      Reflect.getOwnPropertyDescriptor(obj, "name");
+
+      /* 返回一个布尔值，表示当前对象是否可扩展 */
+      Reflect.isExtensible(obj);
+
+      /* 设置对象不可扩展，返回一个布尔值 */
+      Reflect.preventExtensions(obj);
+
+      /* 返回对象的所有属性集合（包括Symbol） 等价于旧对象的属性和 */
+      const sobj = { [Symbol(1)]: 2, name: "zhen" };
+      Reflect.ownKeys(sobj);
+      /* 等价于 以下两个之和 */
+      Object.getOwnPropertyNames(sobj);
+      Object.getOwnPropertySymbols(sobj);
+
+      /* 简易观察者模式 */
+      // 初始化数据
+      const data = { name: "zhenzhen", age: 22 };
+
+      // 添加数据监听
+      const Observer = data =>
+        new Proxy(data, {
+          set: function(target, key, value, receiver) {
+            Reflect.set(target, key, value, receiver);
+            set.forEach(dep => dep());
+          },
+        });
+
+      // 数据劫持
+      const observer = Observer(data);
+      console.log(observer);
+
+      // 将观察者放入set集合
+      const set = new Set();
+      const Watcher = dep => set.add(dep);
+
+      function dep() {
+        console.log(data.name);
+        console.log(data.age);
+      }
+
+      Watcher(dep);
+
+      observer.name = "xiao";
+    </script>
+  </body>
+</html>
