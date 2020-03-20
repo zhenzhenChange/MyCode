@@ -49,7 +49,7 @@ class ZhenVue {
     // 如果加入对象中的属性还是对象，则递归执行
     this.observe(val);
 
-    // 创建一个调度中心
+    // 每个dep实例与data中的每个key一一对应
     const dep = new Dep();
 
     Object.defineProperty(obj, key, {
@@ -72,9 +72,10 @@ class ZhenVue {
   }
 }
 
+/* 管理所有的Watcher */
 class Dep {
   constructor() {
-    // 初始化一个订阅者数组（事件池）
+    // 初始化一个订阅者数组（事件池），存储所有的依赖
     this.deps = [];
   }
 
@@ -98,7 +99,7 @@ class Watcher {
     this.key = key;
     this.cb = cb;
 
-    // 将发布者的 target 指向当前监听者
+    //  将发布者的 target 指向当前监听者
     Dep.target = this;
 
     // 初始化数据，访问了 key 即可触发更新

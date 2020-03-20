@@ -2,13 +2,122 @@
 
 ## new
 
+```js
+function MyNew(fn, ...args) {
+  /* => 1.创建一个新对象 */
+  const obj = Object.create(null);
+
+  /* => 2.将构造函数的原型（作用域）赋给这个新对象（this的指向就指向了这个新对象） */
+  Reflect.setPrototypeOf(obj, fn.prototype);
+
+  /* => 3.执行构造函数（this就是obj，给obj添加属性。this.xxx ） */
+  const result = fn.call(obj, ...args);
+
+  /* => 4.返回新对象（如果构造函数有返回值且是一个引用类型（引用类型皆是Object的实例），则返回该引用类型） */
+  return result instanceof Object ? result : obj;
+}
+
+function Person(name) {
+  this.name = name;
+  return Person;
+}
+
+/* 如果没有 new 操作符，就是执行函数并拿到返回值 */
+// const p = new Person("zhenzhen");
+const p = MyNew(Person, "Hello");
+console.log(p);
+```
+
+## 实现一个 Symbol
+
 ## apply
 
+```js
+/* 与call的区别在于第二个参数可以是一个数组 */
+function MyApply(ctx = window, args) {
+  ctx.fn = this;
+  const result = ctx.fn(args);
+  Reflect.deleteProperty(ctx, "fn");
+  return result;
+}
+
+Function.prototype.MyApply = MyApply;
+```
+
 ## call
+
+```js
+/* => 1.指定上下文（如果没有传参，默认为window） */
+function MyCall(ctx = window, ...args) {
+  /* => 2.给上下文添加一个fn函数，赋值为调用者 */
+  ctx.fn = this;
+
+  /* => 3.执行fn函数（有参数则传入参数），有返回值则返回 */
+  const result = ctx.fn(...args);
+
+  /* => 4.删除该函数 */
+  Reflect.deleteProperty(ctx, "fn");
+
+  return result;
+}
+
+/* => 5.绑定至函数的原型 */
+Function.prototype.MyCall = MyCall;
+```
 
 ## bind
 
 ## instanceof
+
+```js
+/* 参数：L -- 左表达式，R -- 右表达式 */
+function MyInstanceof(L, R) {
+  const rightVal = R.prototype;
+  L = L.__proto__;
+  while (true) {
+    if (L === null) return false;
+    if (L === rightVal) return true;
+
+    L = L.__proto__;
+  }
+}
+
+/* 有问题 */
+console.log(MyInstanceof(1, Object));
+```
+
+## ForEach
+
+## replace
+
+```js
+function myReplace(reg, callback) {
+  const handler = (str, oldVal, newVal) => {
+    const index = str.indexOf(oldVal);
+    return str.substring(0, index) + newVal + str.substring(index + oldVal.length);
+  };
+
+  /* => 备份调用者、判断是否含有模式g、捕获组（捕获不到则为null） */
+  let [cloneStr, isGlobal, arr] = [this.slice(0), reg.global, reg.exec(this)];
+
+  while (arr) {
+    const [res, [content]] = [callback(...arr), arr];
+    cloneStr = handler(cloneStr, content, res);
+    arr = reg.exec(this);
+
+    if (!isGlobal) break;
+  }
+
+  return cloneStr;
+}
+
+String.prototype.myReplace = myReplace;
+
+const str = "{0}年{1}月{2}日";
+const arr = [2020, 03, 20];
+const newStr = str.myReplace(/\{(\d)\}/g, (content, group) => `#${arr[group]}`);
+console.log(newStr);
+```
 
 ## Promise
 
