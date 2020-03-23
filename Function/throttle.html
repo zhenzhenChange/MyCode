@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="btn">点我节流(throttle)</button>
+    <script>
+      /* 节流：类似 setInterval。维护多个定时器
+       * 1.在持续触发事件时，在一定时间内只触发一次事件处理函数
+       * 2.如果在事件处理函数执行完之前又触发了事件，则会被阻止
+       */
+      const btn = document.getElementById("btn");
+
+      const success = () => {
+        console.log("触发了");
+      };
+
+      /* => 1.创建节流函数 */
+      const throttle = (fn, delay) => {
+        /* => 2.设置一个标记 */
+        let flag = true;
+
+        /* => 3.返回一个函数 */
+        return (...args) => {
+          /* => 4.如果标记为 false 禁止往下执行 */
+          if (!flag) return;
+
+          /* => 5.如果标记为 true 则改变标记状态，往下执行 */
+          flag = false;
+
+          /* => 6.执行定时器 */
+          setTimeout(() => {
+            /* => 7.绑定上下文与传入参数 */
+            fn.apply(this, args);
+
+            /* => 8.当回调函数执行完成后改变标记状态 */
+            flag = true;
+          }, delay);
+        };
+      };
+
+      btn.addEventListener("click", throttle(success, 3000));
+    </script>
+  </body>
+</html>

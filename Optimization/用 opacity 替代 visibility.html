@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>用 opacity 替代 visibility</title>
+    <style>
+      #app {
+        width: 100px;
+        height: 100px;
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      setTimeout(() => {
+        /* 总耗时：375us  有重绘过程
+         * Recalculate Style  110us   --- 样式重计算
+         * Update Layer Tree  81us   --- 更新图层树
+         * Paint              24us   --- 重绘
+         * Composite Layers   160us  --- 图层重组
+         */
+        document.getElementById("app").style.visibility = "hidden";
+
+        /* 默认所在的元素不是一个图层，而是依赖于 document ，所以浏览器无法判断。要使其单独在一个图层，加上一个 transform: translateZ(0);
+         * 总耗时：638us  有重绘过程
+         * Recalculate Style  110us  --- 样式重计算
+         * Update Layer Tree  180us  --- 更新图层树
+         * Paint              18us   --- 重绘
+         * Composite Layers   330us  --- 图层重组
+         */
+        // document.getElementById("app").style.opacity = "0";
+      }, 2000);
+    </script>
+  </body>
+</html>

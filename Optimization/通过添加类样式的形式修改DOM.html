@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>通过添加类样式的形式修改DOM</title>
+    <style>
+      #app {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        background-color: red;
+        transform: translateZ(0);
+        transform: translate3d(0, 0, 0);
+      }
+      #app.box {
+        width: 200px;
+        height: 200px;
+        left: 200px;
+        top: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      // 目前的浏览器优化较好。这3种方式都只触发了一次回流重绘
+      setTimeout(() => {
+        /* 
+          document.getElementById("app").style.width = "200px";
+          document.getElementById("app").style.height = "200px";
+          console.log("阻断缓存机制！");
+          document.getElementById("app").style.left = "200px";
+          document.getElementById("app").style.top = "200px";
+         */
+
+        /* 
+          document.getElementById("app").style.width = "200px";
+          document.getElementById("app").style.height = "200px";
+          document.getElementById("app").style.left = "200px";
+          document.getElementById("app").style.top = "200px";
+         */
+        document.getElementById("app").className = "box";
+      }, 2000);
+    </script>
+  </body>
+</html>

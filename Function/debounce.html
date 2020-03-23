@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="btn">点我防抖(debounce)</button>
+    <script>
+      /* 防抖：类似 setTimeout。只维护一个定时器
+       * 1.在持续触发事件时，在一定时间后没有再触发事件，就执行事件处理函数
+       * 2.如果在设定时间到来之前又触发了事件，则重新计时
+       * 3.立即执行版：连续触发事件后，马上执行第一次，之后就不会再执行
+       * 4.非立即执行版：连续触发事件后，只执行最后一次事件处理函数
+       */
+      const btn = document.getElementById("btn");
+
+      const success = () => {
+        console.log("触发了");
+      };
+
+      /* => 1.创建防抖函数 */
+      const debounce = (fn, delay) => {
+        let timer = null;
+
+        /* => 2.返回一个函数 */
+        return (...args) => {
+          timer && clearTimeout(timer);
+
+          /* => 3.设置定时器定时调用回调函数 */
+          timer = setTimeout(() => {
+            /* => 4.绑定上下文与传入参数 */
+            fn.apply(this, args);
+          }, delay);
+        };
+      };
+
+      btn.addEventListener("click", debounce(success, 2000));
+      console.log(navigator.connection);
+    </script>
+  </body>
+</html>

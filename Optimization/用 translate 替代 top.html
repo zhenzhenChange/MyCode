@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>用 translate 替代 top</title>
+    <style>
+      #app {
+        /* position: absolute; */
+        /* top: 0; */
+        transform: translateY(0);
+        width: 100px;
+        height: 100px;
+        background-color: red;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      setTimeout(() => {
+        /* 总耗时：545us  有回流重绘过程
+         * Recalculate Style  120us  --- 样式重计算
+         * Layout             170us  --- 回流重布局
+         * Update Layer Tree  110us  --- 更新图层树
+         * Paint              35us   --- 重绘
+         * Composite Layers   110us  --- 图层重组
+         */
+        // document.getElementById("app").style.top = "100px";
+
+        /* 总耗时：390us  无重绘回流过程  ==> 快了150us
+         * Recalculate Style  160us  --- 样式重计算
+         * Update Layer Tree  110us  --- 更新图层树
+         * Composite Layers   120us  --- 图层重组
+         */
+        document.getElementById("app").style.transform = "translateY(100px)";
+      }, 2000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>利用display-none来做离线渲染</title>
+    <style>
+      #app {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        background-color: red;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script>
+      /* 在使用了 none 之后，由于页面不会显示，即使修改了DOM，也不会触发回流重绘 */
+      setTimeout(() => {
+        document.getElementById("app").style.width = "200px";
+        document.getElementById("app").style.height = "200px";
+        document.getElementById("app").style.left = "200px";
+        document.getElementById("app").style.top = "200px";
+
+        /* 离线修改DOM，等到某一个时间再显示 */
+        // document.getElementById("app").style.display = "block";
+      }, 2000);
+    </script>
+  </body>
+</html>

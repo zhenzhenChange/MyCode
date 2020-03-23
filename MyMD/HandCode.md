@@ -67,6 +67,60 @@ Function.prototype.MyCall = MyCall;
 
 ## bind
 
+```js
+/*
+ * 1.bind没有原型
+ * 2.箭头函数没有原型
+ * 3.Object.create(null) 没有原型
+ */
+
+function MyBind(ctx = window, ...bindArgs) {
+  /* => 1.缓存调用MyBind的上下文 */
+  const target = this;
+
+  /* => 2.如果调用MyBind的上下文不是一个函数，则抛出一个错误 */
+  if (Object.prototype.toString.call(target) !== "[object Function]") {
+    throw new TypeError(`${target} is not a function`);
+  }
+
+  /* => 3.创建一个空函数 */
+  const Empty = function Empty() {};
+
+  /* => 4.创建一个待执行函数 */
+  const FN = function(...fnArgs) {
+    return target.apply(this instanceof Empty ? this : ctx, [...bindArgs, ...fnArgs]);
+  };
+
+  /* => 5.将空函数的原型指向 new 生成的实例对象的原型 */
+  Empty.prototype = this.prototype;
+
+  /* => 6.将待执行函数的原型指向空函数的实例 */
+  FN.prototype = new Empty();
+
+  /* => 7.返回待执行函数 */
+  return FN;
+}
+
+Function.prototype.MyBind = MyBind;
+
+function Person(country, name, age) {
+  this.country = country;
+  this.name = name;
+  this.age = age;
+}
+
+var ChinesePerson = Person.bind(undefined, "China");
+var ChinesePerson2 = Person.MyBind(undefined, "China");
+
+var person1 = new ChinesePerson("LiLi", 14);
+var person2 = new ChinesePerson2("LiLi", 14);
+
+console.log(ChinesePerson);
+console.log(ChinesePerson2);
+console.log(person1);
+console.log(person2);
+```
+
 ## instanceof
 
 ```js
@@ -87,6 +141,23 @@ console.log(MyInstanceof(1, Object));
 ```
 
 ## ForEach
+
+```js
+function MyEach(callback) {
+  if (Array.isArray(this)) {
+    for (let i = 0; i < this.length; i++) {
+      callback(this[i], i, this);
+    }
+  }
+}
+
+Array.prototype.MyEach = MyEach;
+
+const arr = [2, 3, 455, 6233];
+arr.MyEach((item, index, currentArr) => {
+  console.log(item, index, currentArr);
+});
+```
 
 ## replace
 
@@ -463,9 +534,87 @@ Array.prototype.myFlat = myFlat;
 
 ## Ajax
 
-## 防抖
+## 防抖 控制事件触发频率的方法（输入框持续输入模糊查找、onScroll、多次触发事件）
 
-## 节流
+```HTML
+<button id="btn">点我防抖(debounce)</button>
+```
+
+```js
+/* 防抖：类似 setTimeout。只维护一个定时器
+ * 1.在持续触发事件时，在一定时间后没有再触发事件，就执行事件处理函数
+ * 2.如果在设定时间到来之前又触发了事件，则重新计时
+ * 3.立即执行版：连续触发事件后，马上执行第一次，之后就不会再执行
+ * 4.非立即执行版：连续触发事件后，只执行最后一次事件处理函数
+ */
+const btn = document.getElementById("btn");
+
+const success = () => {
+  console.log("触发了");
+};
+
+/* => 1.创建防抖函数 */
+const debounce = (fn, delay) => {
+  let timer = null;
+
+  /* => 2.返回一个函数 */
+  return (...args) => {
+    timer && clearTimeout(timer);
+
+    /* => 3.设置定时器定时调用回调函数 */
+    timer = setTimeout(() => {
+      /* => 4.绑定上下文与传入参数 */
+      fn.apply(this, args);
+    }, delay);
+  };
+};
+
+btn.addEventListener("click", debounce(success, 2000));
+```
+
+## 节流 控制事件触发频率的方法
+
+```HTML
+<button id="btn">点我节流(throttle)</button>
+```
+
+```js
+/* 节流：类似 setInterval。维护多个定时器
+ * 1.在持续触发事件时，在一定时间内只触发一次事件处理函数
+ * 2.如果在事件处理函数执行完之前又触发了事件，则会被阻止
+ */
+const btn = document.getElementById("btn");
+
+const success = () => {
+  console.log("触发了");
+};
+
+/* => 1.创建节流函数 */
+const throttle = (fn, delay) => {
+  /* => 2.设置一个标记 */
+  let flag = true;
+
+  /* => 3.返回一个函数 */
+  return (...args) => {
+    /* => 4.如果标记为 false 禁止往下执行 */
+    if (!flag) return;
+
+    /* => 5.如果标记为 true 则改变标记状态，往下执行 */
+    flag = false;
+
+    /* => 6.执行定时器 */
+    setTimeout(() => {
+      /* => 7.绑定上下文与传入参数 */
+      fn.apply(this, args);
+
+      /* => 8.当回调函数执行完成后改变标记状态 */
+      flag = true;
+    }, delay);
+  };
+};
+
+btn.addEventListener("click", throttle(success, 3000));
+```
 
 ## 原型链继承
 
@@ -706,6 +855,8 @@ function clone(data, deep) {
 ## 回文数
 
 ## 懒加载
+
+## async / await
 
 ## 数组排序（冒泡排序、插入排序、快速排序、选择排序（待实现））
 

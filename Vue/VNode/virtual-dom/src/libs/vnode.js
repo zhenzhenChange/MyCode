@@ -21,6 +21,7 @@ const patches = diff(virtualDOM, newVirtualDOM);
 patchDOM(result, patches);
 
 /**
+ * 1.什么是virtual dom ：用js对象描述DOM
  * TODO ...
  * 1.解决元素每个节点都相同，排序不通，则无需渲染
  * 2.解决在newVirtualDOM新增节点（不管是前面新增还是中间新增还是最后新增）

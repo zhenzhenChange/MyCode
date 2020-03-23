@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>缓存DOM的属性值</title>
+  </head>
+  <body>
+    <script>
+      /* 引起一次回流 */
+      // const s = document.body.clientWidth;
+      for (let i = 0; i < 10; i++) {
+        /* 引起一次回流，应该是浏览器做的优化 */
+        console.log(document.body.clientWidth);
+      }
+    </script>
+  </body>
+</html>
