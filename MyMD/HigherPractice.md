@@ -203,6 +203,7 @@ Func.prototype = {
     console.log(3);
   },
 };
+
 A(); // => 1
 Func.A(); // => 1
 Func().A(); // => 2

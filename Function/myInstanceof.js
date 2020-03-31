@@ -12,3 +12,4 @@ function MyInstanceof(L, R) {
 
 /* 有问题 */
 console.log(MyInstanceof(1, Object));
+console.log(1 instanceof Object);
