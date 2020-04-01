@@ -30,6 +30,36 @@ console.log(p);
 
 ## 实现一个 Symbol
 
+## 实现一个迭代器，用于 Object
+
+```js
+var obj = {
+  a: "a",
+  b: "b",
+  [Symbol.iterator]: function() {
+    var i = 0;
+    var self = this;
+    var keys = Object.keys(this);
+    return {
+      next: function() {
+        var obj = { value: self[keys[i++]], done: i > keys.length };
+        if (obj.done) delete obj.value;
+        return obj;
+      },
+    };
+  },
+};
+
+for (let val of obj) {
+  console.log(val);
+}
+
+var res = obj[Symbol.iterator]();
+console.log(res.next());
+console.log(res.next());
+console.log(res.next());
+```
+
 ## apply
 
 ```js
@@ -65,7 +95,7 @@ function MyCall(ctx = window, ...args) {
 Function.prototype.MyCall = MyCall;
 ```
 
-## bind
+## bind （硬绑定）
 
 ```js
 /*
@@ -119,6 +149,47 @@ console.log(ChinesePerson);
 console.log(ChinesePerson2);
 console.log(person1);
 console.log(person2);
+```
+
+## softBind （软绑定）
+
+```js
+function softBind(ctx, ...args) {
+  const fn = this;
+
+  const bound = function() {
+    /* => 判断如果应用了默认绑定（即 this 指向了 window （非严格模式下）或 undefined （严格模式下）），则绑定成传入的上下文 ctx */
+    return fn.apply(!this || this === window ? ctx : this, args);
+  };
+
+  bound.prototype = Object.create(fn.prototype);
+
+  return bound;
+}
+
+Function.prototype.softBind = softBind;
+
+function foo() {
+  console.log(this.name);
+}
+
+var obj1 = { name: "1" };
+var obj2 = { name: "2" };
+var obj3 = { name: "3" };
+
+/* => 默认绑定 */
+var fooo = foo.softBind(obj1);
+fooo(); // => 1
+
+/* => 隐式绑定 */
+obj2.foo = foo.softBind(obj1);
+obj2.foo(); // => 2
+
+/* => 显示绑定 */
+fooo.call(obj3); // => 3
+
+/* => 默认绑定 */
+setTimeout(obj2.foo, 1000); // => 1
 ```
 
 ## instanceof
