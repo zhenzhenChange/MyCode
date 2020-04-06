@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>立即执行版防抖函数---惰性单例模式</title>
+  </head>
+  <body>
+    <button id="btn">立即执行版防抖(debounce)</button>
+    <script>
+      const btn = document.getElementById('btn');
+
+      const success = () => {
+        console.log('立即触发之后就不会再触发！');
+      };
+
+      /* 其【思想】类似惰性单例模式的第一个核心概念：有且只有一个（次） */
+      const debounce = (fn, delay) => {
+        let flag;
+
+        return (...args) => {
+          if (flag) return;
+
+          flag = setTimeout(() => {
+            fn.apply(this, args);
+          }, delay);
+        };
+      };
+
+      btn.addEventListener('click', debounce(success, 2000));
+    </script>
+  </body>
+</html>

@@ -1,4 +1,10 @@
-/* => 类模式单例 */
+/*
+ * 单例模式：保证一个类仅有一个实例，并提供一个访问它的全局访问点。
+ * 1.设置一个标志，表示当前是否已经创建过对象；
+ * 2.根据标志，如果已经创建过，直接返回之前创建的对象。
+ */
+
+/* => 面向对象版 */
 function Singleton(name) {
   this.name = name;
 }
@@ -13,16 +19,16 @@ Singleton.createInstance = function (name) {
   return this.instance || (this.instance = new Singleton(name));
 };
 
-var instance = Singleton.createInstance('zhenzhen');
+var instance1 = Singleton.createInstance('zhenzhen1');
 var instance2 = Singleton.createInstance('zhenzhen2');
 
-console.log(instance);
+console.log(instance1);
 console.log(instance2);
-console.log(instance === instance2); // => true
+console.log(instance1 === instance2); // => true
 
 /* --------------------------------------------------------- */
 
-/* => JS -> 惰性单例 */
+/* => 关联委托版 */
 const Single = {
   instance: null,
   singleInstance: null,
@@ -35,16 +41,4 @@ Single.singleInstance = Single.createSingle(function () {
   return 'My name is zhenzhen';
 });
 
-const res = Single.singleInstance('zhenzhen');
-console.log(res);
-
-/* 立即执行版防抖函数【思想】即为惰性单例模式 */
-const debounce = (fn, delay) => {
-  let flag;
-  return (...args) => {
-    if (flag) return;
-    flag = setTimeout(() => {
-      fn.apply(this, args);
-    }, delay);
-  };
-};
+console.log(Single.singleInstance('zhenzhen'));
