@@ -6,27 +6,6 @@
     <title>Document</title>
   </head>
   <body>
-    <script>
-      var Something = {
-        cool: function () {
-          this.name = 'zhenzhen';
-          this.count = this.count ? this.count++ : 1;
-        },
-      };
-      Something.cool();
-      console.log(Something);
-      console.log(Something.name);
-      console.log(Something.count);
-
-      var Another = {
-        cool: function () {
-          Something.cool.call(this);
-        },
-      };
-      Another.cool();
-      console.log(Another);
-      console.log(Another.name);
-      console.log(Another.count);
-    </script>
+    <script src="./You Don't Know JavaScript//009-类型转换.js"></script>
   </body>
 </html>
