@@ -98,6 +98,7 @@ function MyJSON(data) {
 
       // 瑕疵 3
       parseResult[eval(content.join(''))] = val;
+      // parseResult[eval(key)] = val;
     }
   }
 

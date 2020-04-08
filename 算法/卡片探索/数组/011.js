@@ -17,6 +17,8 @@ var ary = [
  * @return {void} Do not return anything, modify matrix in-place instead.
  */
 var rotate = function (matrix) {
+  /* => 使用标签语句重写双层 For 循环 */
+
   var len = matrix.length;
 
   for (let i = 0; i < len; i++) {
