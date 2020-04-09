@@ -7,7 +7,25 @@
   </head>
   <body>
     <script>
-      console.log([42] == [42]);
+      var p = {
+        then: function (res, err) {
+          res(43);
+          err('err');
+        },
+      };
+
+      var p1 = new Promise((resolve, reject) => {
+        resolve(42);
+      });
+
+      var p2 = Promise.resolve(p);
+
+      console.log(p1, p2);
+      console.log(p1 === p2);
+      Promise.resolve(p).then(
+        (res) => console.log(res),
+        (err) => console.log(err),
+      );
     </script>
   </body>
 </html>
