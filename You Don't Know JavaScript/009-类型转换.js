@@ -8,7 +8,7 @@ const obj = {
   symbol: Symbol(2),
   undefined: undefined,
   object: { name: 'zhenzhen' },
-  [Symbol('Symbol')]: 'I am Sysmbol1',
+  [Symbol('Symbol')]: 'I am 666',
   [Symbol.toStringTag]: 'zhenzhen',
   function: function () {
     console.log('111');
