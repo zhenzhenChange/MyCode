@@ -1,7 +1,6 @@
-var nums = [3, 3];
-var target = 6;
-
 /**
+ * 两数之和
+ *
  * @param {number[]} nums
  * @param {number} target
  * @return {number[]}
@@ -22,5 +21,7 @@ var twoSum = function (nums, target) {
   return res;
 };
 
+var nums = [3, 3];
+var target = 6;
 var res = twoSum(nums, target);
 console.log(res);

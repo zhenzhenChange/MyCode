@@ -1,30 +1,30 @@
 // 状态值：pending、fulfilled、rejected
-const PENDING = "pending"; // => 等待态
-const FULFILLED = "fulfilled"; // => 成功态
-const REJECTED = "rejected"; // => 失败态
+const PENDING = 'pending'; // => 等待态
+const FULFILLED = 'fulfilled'; // => 成功态
+const REJECTED = 'rejected'; // => 失败态
 
-const ERROR = "不能返回Promise本身，否则会造成循环引用，无限递归";
+const ERROR = '不能返回Promise本身，否则会造成循环引用，无限递归';
 
 const resolvePromise = (newPromise, x, resolve, reject) => {
   // 判断是否为同一个，不能返回Promise本身，否则会造成循环引用，无限递归
   if (newPromise === x) return reject(new TypeError(ERROR));
 
-  if ((typeof x === "object" && x !== null) || typeof x === "function") {
+  if ((typeof x === 'object' && x !== null) || typeof x === 'function') {
     let called;
 
     try {
       const then = x.then;
 
-      if (typeof then === "function") {
+      if (typeof then === 'function') {
         then.call(
           x,
-          y => {
+          (y) => {
             if (called) return;
             called = true;
 
             resolvePromise(newPromise, y, resolve, reject);
           },
-          r => {
+          (r) => {
             if (called) return;
             called = true;
 
@@ -45,9 +45,9 @@ const resolvePromise = (newPromise, x, resolve, reject) => {
   }
 };
 
-const isPromise = x => {
-  if ((typeof x === "object" && x !== null) || typeof x === "function") {
-    return typeof x.then === "function";
+const isPromise = (x) => {
+  if ((typeof x === 'object' && x !== null) || typeof x === 'function') {
+    return typeof x.then === 'function';
   }
   return false;
 };
@@ -70,24 +70,24 @@ class MyPromise {
     this.rejectArray = [];
 
     // 成功的回调
-    const resolve = value => {
+    const resolve = (value) => {
       if (this.status === PENDING) {
         this.status = FULFILLED;
         this.value = value;
 
         // 发布
-        this.resolveArray.forEach(fn => fn());
+        this.resolveArray.forEach((fn) => fn());
       }
     };
 
     // 失败的回调
-    const reject = reason => {
+    const reject = (reason) => {
       if (this.status === PENDING) {
         this.status = REJECTED;
         this.reason = reason;
 
         // 发布
-        this.rejectArray.forEach(fn => fn());
+        this.rejectArray.forEach((fn) => fn());
       }
     };
 
@@ -101,11 +101,11 @@ class MyPromise {
   }
 
   then(onFulfilled, onRejected) {
-    onFulfilled = typeof onFulfilled === "function" ? onFulfilled : val => val;
+    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : (val) => val;
     onRejected =
-      typeof onRejected === "function"
+      typeof onRejected === 'function'
         ? onRejected
-        : val => {
+        : (val) => {
             throw val;
           };
 
@@ -175,11 +175,11 @@ class MyPromise {
         }),
     ); */
     return this.then(
-      value => {
+      (value) => {
         callback();
         return value;
       },
-      reason => {
+      (reason) => {
         callback();
         return reason;
       },
@@ -215,9 +215,11 @@ class MyPromise {
   static any() {}
 
   static all(promises) {
-    if (!Array.isArray(promises)) throw new TypeError("Iterable Is Not Array");
+    if (!Array.isArray(promises)) throw new TypeError('Iterable Is Not Array');
     return new MyPromise((resolve, reject) => {
       const results = [];
+
+      // 如果改成 const ，++count 不会报错
       let count = 0;
 
       const processData = (i, data) => {
@@ -230,7 +232,7 @@ class MyPromise {
       promises.forEach((promise, index) => {
         let item = promises[index];
         if (isPromise(item)) {
-          promise.then(data => {
+          promise.then((data) => {
             processData(index, data);
           }, reject);
         } else {
@@ -241,9 +243,9 @@ class MyPromise {
   }
 
   static race(promises) {
-    if (!Array.isArray(promises)) throw new TypeError("Iterable Is Not Array");
+    if (!Array.isArray(promises)) throw new TypeError('Iterable Is Not Array');
     return new MyPromise((resolve, reject) => {
-      promises.forEach(promise => {
+      promises.forEach((promise) => {
         promise.then(resolve, reject);
       });
     });
@@ -271,7 +273,7 @@ class MyPromise {
 }
 
 /* 单元测试 */
-MyPromise.deferred = function() {
+MyPromise.deferred = function () {
   let dfd = {};
   dfd.promise = new MyPromise((resolve, reject) => {
     dfd.resolve = resolve;

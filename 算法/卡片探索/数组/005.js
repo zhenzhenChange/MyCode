@@ -1,6 +1,6 @@
-var nums = [4, 1, 2, 1, 2];
-
 /**
+ * 只出现一次的数字
+ *
  * @param {number[]} nums
  * @return {number}
  */
@@ -19,5 +19,6 @@ var singleNumber = function (nums) {
   }
 };
 
+var nums = [4, 1, 2, 1, 2];
 const res = singleNumber(nums);
 console.log(res);

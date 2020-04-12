@@ -1,5 +1,6 @@
-var x = -123;
 /**
+ * 整数反转
+ * 
  * @param {number} x
  * @return {number}
  */
@@ -18,5 +19,6 @@ var reverse = function (x) {
   return y;
 };
 
+var x = -123;
 var res = reverse(x);
 console.log(res);

@@ -48,9 +48,7 @@ function fn2(time, info) {
 publisher.addSubscriber('ming', fn);
 publisher.addSubscriber('ming', fn2);
 
-publisher.addSubscriber('zhen', (time, info) => {
-  console.log('zhen', time, info);
-});
+publisher.addSubscriber('zhen', (time, info) => console.log('zhen', time, info));
 
 publisher.releaseNotice('ming', '326', '你好');
 publisher.releaseNotice('zhen', '3262', '你好2');
