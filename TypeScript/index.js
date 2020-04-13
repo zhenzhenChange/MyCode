@@ -1,9 +1,13 @@
-var Foo = /** @class */ (function () {
-    function Foo() {
-    }
-    return Foo;
-}());
-var foo = new Foo();
-var bar;
-var baz;
-var bbb = 123;
+function foo(arg) {
+    return arg;
+}
+var num = 123;
+var result = foo(num);
+console.log(result);
+var str = 'str';
+var bool = true;
+var ary;
+ary = [true];
+ary.push(false);
+var bry = [];
+bry.push([]);
