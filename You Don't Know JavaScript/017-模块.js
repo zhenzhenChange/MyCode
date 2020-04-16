@@ -13,4 +13,3 @@ function module(name) {
 
 const MyModule = module('zhenzhen');
 MyModule.SayHello();
-
