@@ -10,19 +10,24 @@ var fizzBuzz = function (n) {
 
   while (i <= n) {
     if (i % 3 == 0 && i % 5 == 0) {
-      ary.push('FizzBuzz');
+      // ary.push('FizzBuzz');
+      ary[i] = 'FizzBuzz';
     } else if (i % 3 == 0) {
-      ary.push('Fizz');
+      // ary.push('Fizz');
+      ary[i] = 'Fizz';
     } else if (i % 5 == 0) {
-      ary.push('Buzz');
+      // ary.push('Buzz');
+      ary[i] = 'Buzz';
     } else {
       // ary.push(String(i));
-      ary.push(i + ''); // 比调用函数要快
+      // ary.push(i + ''); // 比调用函数要快
+      ary[i] = i + '';
     }
 
     i++;
   }
 
+  ary.shift();
   return ary;
 };
 
