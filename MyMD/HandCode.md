@@ -24,7 +24,7 @@ function Person(name) {
 
 /* 如果没有 new 操作符，就是执行函数并拿到返回值 */
 // const p = new Person("zhenzhen");
-const p = MyNew(Person, "Hello");
+const p = MyNew(Person, 'Hello');
 console.log(p);
 ```
 
@@ -34,14 +34,14 @@ console.log(p);
 
 ```js
 var obj = {
-  a: "a",
-  b: "b",
-  [Symbol.iterator]: function() {
+  a: 'a',
+  b: 'b',
+  [Symbol.iterator]: function () {
     var i = 0;
     var self = this;
     var keys = Object.keys(this);
     return {
-      next: function() {
+      next: function () {
         var obj = { value: self[keys[i++]], done: i > keys.length };
         if (obj.done) delete obj.value;
         return obj;
@@ -67,7 +67,7 @@ console.log(res.next());
 function MyApply(ctx = window, args) {
   ctx.fn = this;
   const result = ctx.fn(args);
-  Reflect.deleteProperty(ctx, "fn");
+  Reflect.deleteProperty(ctx, 'fn');
   return result;
 }
 
@@ -86,7 +86,7 @@ function MyCall(ctx = window, ...args) {
   const result = ctx.fn(...args);
 
   /* => 4.删除该函数 */
-  Reflect.deleteProperty(ctx, "fn");
+  Reflect.deleteProperty(ctx, 'fn');
 
   return result;
 }
@@ -109,7 +109,7 @@ function MyBind(ctx = window, ...bindArgs) {
   const target = this;
 
   /* => 2.如果调用MyBind的上下文不是一个函数，则抛出一个错误 */
-  if (Object.prototype.toString.call(target) !== "[object Function]") {
+  if (Object.prototype.toString.call(target) !== '[object Function]') {
     throw new TypeError(`${target} is not a function`);
   }
 
@@ -117,7 +117,7 @@ function MyBind(ctx = window, ...bindArgs) {
   const Empty = function Empty() {};
 
   /* => 4.创建一个待执行函数 */
-  const FN = function(...fnArgs) {
+  const FN = function (...fnArgs) {
     return target.apply(this instanceof Empty ? this : ctx, [...bindArgs, ...fnArgs]);
   };
 
@@ -139,11 +139,11 @@ function Person(country, name, age) {
   this.age = age;
 }
 
-var ChinesePerson = Person.bind(undefined, "China");
-var ChinesePerson2 = Person.MyBind(undefined, "China");
+var ChinesePerson = Person.bind(undefined, 'China');
+var ChinesePerson2 = Person.MyBind(undefined, 'China');
 
-var person1 = new ChinesePerson("LiLi", 14);
-var person2 = new ChinesePerson2("LiLi", 14);
+var person1 = new ChinesePerson('LiLi', 14);
+var person2 = new ChinesePerson2('LiLi', 14);
 
 console.log(ChinesePerson);
 console.log(ChinesePerson2);
@@ -157,7 +157,7 @@ console.log(person2);
 function softBind(ctx, ...args) {
   const fn = this;
 
-  const bound = function() {
+  const bound = function () {
     /* => 判断如果应用了默认绑定（即 this 指向了 window （非严格模式下）或 undefined （严格模式下）），则绑定成传入的上下文 ctx */
     return fn.apply(!this || this === window ? ctx : this, args);
   };
@@ -173,9 +173,9 @@ function foo() {
   console.log(this.name);
 }
 
-var obj1 = { name: "1" };
-var obj2 = { name: "2" };
-var obj3 = { name: "3" };
+var obj1 = { name: '1' };
+var obj2 = { name: '2' };
+var obj3 = { name: '3' };
 
 /* => 默认绑定 */
 var fooo = foo.softBind(obj1);
@@ -255,7 +255,7 @@ function myReplace(reg, callback) {
 
 String.prototype.myReplace = myReplace;
 
-const str = "{0}年{1}月{2}日";
+const str = '{0}年{1}月{2}日';
 const arr = [2020, 03, 20];
 const newStr = str.myReplace(/\{(\d)\}/g, (content, group) => `#${arr[group]}`);
 console.log(newStr);
@@ -265,32 +265,32 @@ console.log(newStr);
 
 ```javascript
 // 状态值：pending、fulfilled、rejected
-const PENDING = "pending"; // => 等待态
-const FULFILLED = "fulfilled"; // => 成功态
-const REJECTED = "rejected"; // => 失败态
+const PENDING = 'pending'; // => 等待态
+const FULFILLED = 'fulfilled'; // => 成功态
+const REJECTED = 'rejected'; // => 失败态
 
-const ERROR = "不能返回Promise本身，否则会造成循环引用，无限递归";
+const ERROR = '不能返回Promise本身，否则会造成循环引用，无限递归';
 
 const resolvePromise = (newPromise, x, resolve, reject) => {
   // 判断是否为同一个，不能返回Promise本身，否则会造成循环引用，无限递归
   if (newPromise === x) return reject(new TypeError(ERROR));
 
-  if ((typeof x === "object" && x !== null) || typeof x === "function") {
+  if ((typeof x === 'object' && x !== null) || typeof x === 'function') {
     let called;
 
     try {
       const then = x.then;
 
-      if (typeof then === "function") {
+      if (typeof then === 'function') {
         then.call(
           x,
-          y => {
+          (y) => {
             if (called) return;
             called = true;
 
             resolvePromise(newPromise, y, resolve, reject);
           },
-          r => {
+          (r) => {
             if (called) return;
             called = true;
 
@@ -311,9 +311,9 @@ const resolvePromise = (newPromise, x, resolve, reject) => {
   }
 };
 
-const isPromise = x => {
-  if ((typeof x === "object" && x !== null) || typeof x === "function") {
-    return typeof x.then === "function";
+const isPromise = (x) => {
+  if ((typeof x === 'object' && x !== null) || typeof x === 'function') {
+    return typeof x.then === 'function';
   }
   return false;
 };
@@ -336,24 +336,24 @@ class MyPromise {
     this.rejectArray = [];
 
     // 成功的回调
-    const resolve = value => {
+    const resolve = (value) => {
       if (this.status === PENDING) {
         this.status = FULFILLED;
         this.value = value;
 
         // 发布
-        this.resolveArray.forEach(fn => fn());
+        this.resolveArray.forEach((fn) => fn());
       }
     };
 
     // 失败的回调
-    const reject = reason => {
+    const reject = (reason) => {
       if (this.status === PENDING) {
         this.status = REJECTED;
         this.reason = reason;
 
         // 发布
-        this.rejectArray.forEach(fn => fn());
+        this.rejectArray.forEach((fn) => fn());
       }
     };
 
@@ -367,11 +367,11 @@ class MyPromise {
   }
 
   then(onFulfilled, onRejected) {
-    onFulfilled = typeof onFulfilled === "function" ? onFulfilled : val => val;
+    onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : (val) => val;
     onRejected =
-      typeof onRejected === "function"
+      typeof onRejected === 'function'
         ? onRejected
-        : val => {
+        : (val) => {
             throw val;
           };
 
@@ -441,11 +441,11 @@ class MyPromise {
         }),
     ); */
     return this.then(
-      value => {
+      (value) => {
         callback();
         return value;
       },
-      reason => {
+      (reason) => {
         callback();
         return reason;
       },
@@ -481,7 +481,7 @@ class MyPromise {
   static any() {}
 
   static all(promises) {
-    if (!Array.isArray(promises)) throw new TypeError("Iterable Is Not Array");
+    if (!Array.isArray(promises)) throw new TypeError('Iterable Is Not Array');
     return new MyPromise((resolve, reject) => {
       const results = [];
       let count = 0;
@@ -496,7 +496,7 @@ class MyPromise {
       promises.forEach((promise, index) => {
         let item = promises[index];
         if (isPromise(item)) {
-          promise.then(data => {
+          promise.then((data) => {
             processData(index, data);
           }, reject);
         } else {
@@ -507,9 +507,9 @@ class MyPromise {
   }
 
   static race(promises) {
-    if (!Array.isArray(promises)) throw new TypeError("Iterable Is Not Array");
+    if (!Array.isArray(promises)) throw new TypeError('Iterable Is Not Array');
     return new MyPromise((resolve, reject) => {
-      promises.forEach(promise => {
+      promises.forEach((promise) => {
         promise.then(resolve, reject);
       });
     });
@@ -537,7 +537,7 @@ class MyPromise {
 }
 
 /* 单元测试 */
-MyPromise.deferred = function() {
+MyPromise.deferred = function () {
   let dfd = {};
   dfd.promise = new MyPromise((resolve, reject) => {
     dfd.resolve = resolve;
@@ -565,18 +565,18 @@ const newArr = arr.flat(Infinity);
 /* 转换为字符串 */
 const newBrr = arr
   .toString()
-  .split(",")
-  .map(item => Number(item));
+  .split(',')
+  .map((item) => Number(item));
 
 const newCrr = JSON.stringify(arr)
-  .replace(/(\[|\])/g, "")
-  .split(",")
-  .map(item => Number(item));
+  .replace(/(\[|\])/g, '')
+  .split(',')
+  .map((item) => Number(item));
 
 /* --------------------------------------------- */
 
 /* 循环判断是否为数组 */
-while (arr.some(item => Array.isArray(item))) {
+while (arr.some((item) => Array.isArray(item))) {
   arr = [].concat(...arr);
 }
 
@@ -584,7 +584,7 @@ while (arr.some(item => Array.isArray(item))) {
 
 function myFlat() {
   const newArr = [];
-  const fn = arr => {
+  const fn = (arr) => {
     for (let i = 0; i < arr.length; i++) {
       if (Array.isArray(arr[i])) {
         fn(arr[i]);
@@ -618,10 +618,10 @@ Array.prototype.myFlat = myFlat;
  * 3.立即执行版：连续触发事件后，马上执行第一次，之后就不会再执行
  * 4.非立即执行版：连续触发事件后，只执行最后一次事件处理函数
  */
-const btn = document.getElementById("btn");
+const btn = document.getElementById('btn');
 
 const success = () => {
-  console.log("触发了");
+  console.log('触发了');
 };
 
 /* => 1.创建防抖函数 */
@@ -640,7 +640,7 @@ const debounce = (fn, delay) => {
   };
 };
 
-btn.addEventListener("click", debounce(success, 2000));
+btn.addEventListener('click', debounce(success, 2000));
 ```
 
 ## 节流 控制事件触发频率的方法
@@ -654,10 +654,10 @@ btn.addEventListener("click", debounce(success, 2000));
  * 1.在持续触发事件时，在一定时间内只触发一次事件处理函数
  * 2.如果在事件处理函数执行完之前又触发了事件，则会被阻止
  */
-const btn = document.getElementById("btn");
+const btn = document.getElementById('btn');
 
 const success = () => {
-  console.log("触发了");
+  console.log('触发了');
 };
 
 /* => 1.创建节流函数 */
@@ -684,7 +684,7 @@ const throttle = (fn, delay) => {
   };
 };
 
-btn.addEventListener("click", throttle(success, 3000));
+btn.addEventListener('click', throttle(success, 3000));
 ```
 
 ## 原型链继承
@@ -698,46 +698,46 @@ const typeFuncs = Object.create(null);
 const toString = Object.prototype.toString;
 
 /* 原始类型 */
-Reflect.set(typeGather, "isNull", "Null");
-Reflect.set(typeGather, "isNumber", "Number");
-Reflect.set(typeGather, "isString", "String");
-Reflect.set(typeGather, "isSymbol", "Symbol");
-Reflect.set(typeGather, "isBoolean", "Boolean");
-Reflect.set(typeGather, "isUndefined", "Undefined");
+Reflect.set(typeGather, 'isNull', 'Null');
+Reflect.set(typeGather, 'isNumber', 'Number');
+Reflect.set(typeGather, 'isString', 'String');
+Reflect.set(typeGather, 'isSymbol', 'Symbol');
+Reflect.set(typeGather, 'isBoolean', 'Boolean');
+Reflect.set(typeGather, 'isUndefined', 'Undefined');
 
 /* 内置对象 or 引用类型 */
-Reflect.set(typeGather, "isSet", "Set");
-Reflect.set(typeGather, "isMap", "Map");
-Reflect.set(typeGather, "isMath", "Math");
-Reflect.set(typeGather, "isJSON", "JSON");
-Reflect.set(typeGather, "isDate", "Date");
-Reflect.set(typeGather, "isError", "Error");
-Reflect.set(typeGather, "isArray", "Array");
-Reflect.set(typeGather, "isRegExp", "RegExp");
-Reflect.set(typeGather, "isWindow", "Window");
-Reflect.set(typeGather, "isObject", "Object");
-Reflect.set(typeGather, "isFunction", "Function");
+Reflect.set(typeGather, 'isSet', 'Set');
+Reflect.set(typeGather, 'isMap', 'Map');
+Reflect.set(typeGather, 'isMath', 'Math');
+Reflect.set(typeGather, 'isJSON', 'JSON');
+Reflect.set(typeGather, 'isDate', 'Date');
+Reflect.set(typeGather, 'isError', 'Error');
+Reflect.set(typeGather, 'isArray', 'Array');
+Reflect.set(typeGather, 'isRegExp', 'RegExp');
+Reflect.set(typeGather, 'isWindow', 'Window');
+Reflect.set(typeGather, 'isObject', 'Object');
+Reflect.set(typeGather, 'isFunction', 'Function');
 
 /* 遍历生成方法 */
-Reflect.ownKeys(typeGather).forEach(key => {
-  typeFuncs[key] = val => toString.call(val) === `[object ${Reflect.get(typeGather, key)}]`;
+Reflect.ownKeys(typeGather).forEach((key) => {
+  typeFuncs[key] = (val) => toString.call(val) === `[object ${Reflect.get(typeGather, key)}]`;
 });
 
 console.log(typeFuncs.isNull(null)); // => "[object Null]"
 console.log(typeFuncs.isNumber(123)); // => "[object Number]"
 console.log(typeFuncs.isNumber(NaN)); // => "[object Number]"
-console.log(typeFuncs.isString("str")); // => "[object String]"
+console.log(typeFuncs.isString('str')); // => "[object String]"
 console.log(typeFuncs.isBoolean(true)); // => "[object Boolean]"
 console.log(typeFuncs.isUndefined(undefined)); // => "[object Undefined]"
-console.log(typeFuncs.isSymbol(Symbol("Symbol"))); // => "[object Symbol]"
+console.log(typeFuncs.isSymbol(Symbol('Symbol'))); // => "[object Symbol]"
 
 console.log(typeFuncs.isDate(new Date())); // => "[object Date]"
 console.log(typeFuncs.isRegExp(/^hello/)); // => "[object RegExp]"
-console.log(typeFuncs.isArray(["/^hello/"])); // => "[object Array]"
+console.log(typeFuncs.isArray(['/^hello/'])); // => "[object Array]"
 console.log(typeFuncs.isFunction(Window)); // => "[object Function]"
 console.log(typeFuncs.isFunction(() => {})); // => "[object Function]"
-console.log(typeFuncs.isFunction(function() {})); // => "[object Function]"
-console.log(typeFuncs.isObject({ name: "zhenzhen" })); // => "[object Object]"
+console.log(typeFuncs.isFunction(function () {})); // => "[object Function]"
+console.log(typeFuncs.isObject({ name: 'zhenzhen' })); // => "[object Object]"
 
 console.log(typeFuncs.isMath(Math)); // => "[object Math]"
 console.log(typeFuncs.isSet(new Set())); // => "[object Set]"
@@ -754,10 +754,10 @@ console.log(typeFuncs.isError(new Error())); // => "[object Error]"
 
 ```javascript
 /* 后端服务 */
-const express = require("./node_modules/express");
+const express = require('./node_modules/express');
 const app = express();
 
-app.get("/jsonp", (req, res) => {
+app.get('/jsonp', (req, res) => {
   const { msg, cb } = req.query;
   console.log(msg);
   console.log(cb);
@@ -778,10 +778,10 @@ function jsonp({ url, params, cb }) {
   // => 1.返回一个Promise
   return new Promise((resolve, reject) => {
     // => 2.创建script标签
-    const script = document.createElement("script");
+    const script = document.createElement('script');
 
     // => 3.给全局对象添加一个属性，值为一个回调函数，并且把返回的数据resolve出去
-    window[cb] = function(data) {
+    window[cb] = function (data) {
       resolve(data);
 
       // => 4.用完即删
@@ -796,7 +796,7 @@ function jsonp({ url, params, cb }) {
     }
 
     // => 6.拼接URL
-    script.src = `${url}?${arr.join("&")}`;
+    script.src = `${url}?${arr.join('&')}`;
 
     // => 7.将script添加到页面实现跨域请求
     document.body.appendChild(script);
@@ -804,10 +804,10 @@ function jsonp({ url, params, cb }) {
 }
 
 jsonp({
-  url: "http://localhost:3344/jsonp",
-  params: { msg: "Hello" },
-  cb: "cross",
-}).then(data => console.log(data));
+  url: 'http://localhost:3344/jsonp',
+  params: { msg: 'Hello' },
+  cb: 'cross',
+}).then((data) => console.log(data));
 ```
 
 ## isNaN
@@ -865,7 +865,7 @@ const newErr = [];
 arr.sort((a, b) => a - b);
 
 // 拆分数组并且每项后面拼接一个字符串
-const strArr = arr.join("@") + "@";
+const strArr = arr.join('@') + '@';
 
 // 正则：以数字开头+@符结尾，捕获0 - N 次
 const reg = /(\d+@)\1*/g;
@@ -886,7 +886,7 @@ var obj = {
   b: [10, 20, 30],
   c: { x: 111 },
   d: /^\d+$/,
-  e: function() {
+  e: function () {
     console.log(1);
   },
 };
@@ -910,7 +910,7 @@ function clone(data, deep) {
   var copy = new data.constructor();
   if (deep) {
     if (data === null) return null;
-    if (typeof data !== "object") return data;
+    if (typeof data !== 'object') return data;
     if (data instanceof RegExp) return new RegExp(data);
     if (data instanceof Date) return new Date(data);
     for (const key in data) {
@@ -1041,9 +1041,9 @@ function coinChange(coins: Array<number>, amount: number): number {
   /** TODO:代码实现 */
 
   if (Array.isArray(coins)) {
-    coins.forEach(item => {});
+    coins.forEach((item) => {});
   } else {
-    console.log("conins 不是一个数组~");
+    console.log('conins 不是一个数组~');
   }
   return 1;
 }
@@ -1082,7 +1082,7 @@ var input = [
 function rangeStringify(input: Array<any>): string {
   /* TODO: 代码实现 */
   let str: string;
-  input.forEach(item => {
+  input.forEach((item) => {
     const moqPe = item.moqPe;
     const pricePe = item.pricePe;
     if (moqPe < 5) {
@@ -1110,13 +1110,13 @@ function rangeStringify(input: Array<any>): string {
  * mask('阿里巴巴集团', '?'); // 阿????团
  */
 
-console.log(mask("alibaba", "#"));
-console.log(mask("85022088"));
-console.log(mask("hello"));
-console.log(mask("abc", "?"));
-console.log(mask("阿里巴巴集团", "?"));
+console.log(mask('alibaba', '#'));
+console.log(mask('85022088'));
+console.log(mask('hello'));
+console.log(mask('abc', '?'));
+console.log(mask('阿里巴巴集团', '?'));
 
-function mask(str: string, char: string = "*"): string {
+function mask(str: string, char: string = '*'): string {
   /* TODO:代码实现 */
 
   let newStr: string;
@@ -1146,7 +1146,7 @@ function mask(str: string, char: string = "*"): string {
   return newStr;
 }
 
-/** 
+/** 使用组合设计模式
  * 平铺节点数组转嵌套树 
  * 说明：将一个包含深度信息的节点数组转换成一棵树，要求只能遍历一次该数组 
  * 输入值：TreeNode数组 TreeNode为包含title, depth(正整数，深度不限)字段的Object 
@@ -1200,13 +1200,13 @@ function mask(str: string, char: string = "*"): string {
 ] 
 */
 const arr = [
-  { title: "1", depth: 1 },
-  { title: "1-1", depth: 2 },
-  { title: "1-1-1", depth: 3 },
-  { title: "1-1-2", depth: 3 },
-  { title: "1-2", depth: 2 },
-  { title: "2", depth: 1 },
-  { title: "2-1", depth: 2 },
+  { title: '1', depth: 1 },
+  { title: '1-1', depth: 2 },
+  { title: '1-1-1', depth: 3 },
+  { title: '1-1-2', depth: 3 },
+  { title: '1-2', depth: 2 },
+  { title: '2', depth: 1 },
+  { title: '2-1', depth: 2 },
 ];
 depthArray2Tree(arr);
 
