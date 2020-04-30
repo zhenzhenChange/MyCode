@@ -37,8 +37,6 @@ const Single = {
   },
 };
 
-Single.singleInstance = Single.createSingle(function () {
-  return 'My name is zhenzhen';
-});
+Single.singleInstance = Single.createSingle(() => 'My name is zhenzhen');
 
 console.log(Single.singleInstance('zhenzhen'));

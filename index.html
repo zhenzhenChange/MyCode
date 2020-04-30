@@ -4,14 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
+    <style>
+      #app {
+        width: 200px;
+        height: 100px;
+        position: relative;
+        background-color: red;
+      }
+
+      #app::after {
+        content: '';
+        width: 50px;
+        height: 50px;
+        position: absolute;
+        top: 50%;
+        left: 0%;
+        transform: translate(-50%, -50%);
+        background-color: #fff;
+        border-radius: 50%;
+      }
+    </style>
   </head>
   <body>
-    <script>
-      'use strict';
-      var a = 1;
-      var b = c;
-      var c = 2;
-      console.log(a + b);
-    </script>
+    <div id="app"></div>
   </body>
 </html>
