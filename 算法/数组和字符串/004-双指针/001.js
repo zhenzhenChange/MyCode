@@ -14,9 +14,8 @@ var reverseString = function (s) {
     left++;
     right--;
   }
-
-  return s;
 };
 
 var s = ['h', 'e', 'l', 'l', 'o'];
-console.log(reverseString(s));
+reverseString(s);
+console.log(s);

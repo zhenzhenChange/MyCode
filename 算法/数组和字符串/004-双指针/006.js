@@ -13,8 +13,7 @@ var minSubArrayLen = function (s, nums) {
   let result = len + 1;
 
   while (left < len) {
-    if (right < len && sum < s) sum += nums[right++];
-    else sum -= nums[left++];
+    right < len && sum < s ? (sum += nums[right++]) : (sum -= nums[left++]);
 
     if (sum >= s) result = Math.min(result, right - left);
   }
