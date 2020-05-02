@@ -1147,57 +1147,57 @@ function mask(str: string, char: string = '*'): string {
 }
 
 /** 使用组合设计模式
- * 平铺节点数组转嵌套树 
- * 说明：将一个包含深度信息的节点数组转换成一棵树，要求只能遍历一次该数组 
- * 输入值：TreeNode数组 TreeNode为包含title, depth(正整数，深度不限)字段的Object 
- * 输出值：组装好的嵌套树，子节点挂载在对应父节点的children字段上 
- 
-举例 (title字段仅为便于理解，实际无固定规则) 
-输入：[ 
-  { title: '1', depth: 1 }, 
-  { title: '1-1', depth: 2 }, 
-  { title: '1-1-1', depth: 3 }, 
-  { title: '1-1-2', depth: 3 }, 
-  { title: '1-2', depth: 2 }, 
-  { title: '2', depth: 1 }, 
-  { title: '2-1', depth: 2 }, 
-] 
-输出：[ 
-  { 
-    "title": "1", 
-    "depth": 1, 
-    "children": [ 
-      { 
-        "title": "1-1", 
-        "depth": 2, 
-        "children": [ 
-          { 
-            "title": "1-1-1", 
-            "depth": 3 
-          }, 
-          { 
-            "title": "1-1-2", 
-            "depth": 3 
-          } 
-        ] 
-      }, 
-      { 
-        "title": "1-2", 
-        "depth": 2 
-      } 
-    ] 
-  }, 
-  { 
-    "title": "2", 
-    "depth": 1, 
-    "children": [ 
-      { 
-        "title": "2-1", 
-        "depth": 2 
-      } 
-    ] 
-  } 
-] 
+ * 平铺节点数组转嵌套树
+ * 说明：将一个包含深度信息的节点数组转换成一棵树，要求只能遍历一次该数组
+ * 输入值：TreeNode数组 TreeNode为包含title, depth(正整数，深度不限)字段的Object
+ * 输出值：组装好的嵌套树，子节点挂载在对应父节点的children字段上
+
+举例 (title字段仅为便于理解，实际无固定规则)
+输入：[
+  { title: '1', depth: 1 },
+  { title: '1-1', depth: 2 },
+  { title: '1-1-1', depth: 3 },
+  { title: '1-1-2', depth: 3 },
+  { title: '1-2', depth: 2 },
+  { title: '2', depth: 1 },
+  { title: '2-1', depth: 2 },
+]
+输出：[
+  {
+    "title": "1",
+    "depth": 1,
+    "children": [
+      {
+        "title": "1-1",
+        "depth": 2,
+        "children": [
+          {
+            "title": "1-1-1",
+            "depth": 3
+          },
+          {
+            "title": "1-1-2",
+            "depth": 3
+          }
+        ]
+      },
+      {
+        "title": "1-2",
+        "depth": 2
+      }
+    ]
+  },
+  {
+    "title": "2",
+    "depth": 1,
+    "children": [
+      {
+        "title": "2-1",
+        "depth": 2
+      }
+    ]
+  }
+]
 */
 const arr = [
   { title: '1', depth: 1 },
@@ -1232,4 +1232,44 @@ function depthArray2Tree(depthArray: Array<any>): Array<any> {
 
   return newArr;
 }
+```
+
+## 链式调用
+
+```js
+var a = obj(1);
+var b = a.add(2);
+var c = b.add(3);
+// a 里面有 1，b 里面有 1，2，c 里面有 1，2，3
+```
+
+```js
+class File {
+  constructor(val) {
+    this.val = val;
+    this.parent = [];
+  }
+
+  add(file) {
+    file.parent.push(this.val);
+
+    this.parent.length != 0 && file.parent.push(...this.parent);
+
+    return file;
+  }
+}
+
+var a = new File(1);
+var b = a.add(new File(2));
+var c = b.add(new File(3));
+var d = c.add(new File(4));
+var e = d.add(new File(5));
+var f = e.add(new File(6));
+
+console.log(a);
+console.log(b);
+console.log(c);
+console.log(d);
+console.log(e);
+console.log(f);
 ```

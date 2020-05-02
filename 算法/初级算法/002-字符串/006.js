@@ -14,7 +14,5 @@ var myAtoi = function (str) {
   return result;
 };
 
-var str = '   -115579378e25';
-var result = myAtoi(str);
-console.log(typeof result, result);
-console.log(!NaN);
+var str = '+-2';
+console.log(myAtoi(str));
