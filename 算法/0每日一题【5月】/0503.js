@@ -8,9 +8,6 @@
  * @return {number}
  */
 var maxSubArray = function (nums) {
-  // 执行用时：80 ms，在所有 JavaScript 提交中击败了 35.33% 的用户
-  // 内存消耗：35.1 MB，在所有 JavaScript 提交中击败了 100.00% 的用户
-
   let left = 0;
   let result = 0;
 
