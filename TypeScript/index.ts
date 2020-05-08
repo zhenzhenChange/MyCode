@@ -256,3 +256,108 @@ function init() {
   a = [1, 2, 3, 4];
   b = [1, 2, 3, 4];
 }
+
+const AB = 123;
+AB.toString();
+
+// 参数注解
+let variable: { bar: number };
+function h(variable: { bar: number }) {}
+
+// 返回类型 注解
+interface FF {
+  foo: string;
+}
+
+function FL(sample: FF): FF {
+  // return { foo: '123' };
+  return sample;
+}
+
+// 可选参数
+function FA(bar: number, bas?: string): void {}
+
+FA(123);
+FA(123, '33');
+
+// 默认参数
+function BA(bar: number, bas: string = 'Hello') {}
+BA(123);
+BA(22, '1');
+
+// 重载
+function padding(all: number): any;
+function padding(tb: number, lr: number): any;
+function padding(t: number, r: number, b: number, l: number): any;
+
+function padding(a: number, b?: number, c?: number, d?: any): any {
+  if (b === undefined && c === undefined && d === undefined) b = c = d = a;
+  else if (c === undefined && d === undefined) {
+    c = a;
+    d = b;
+  }
+
+  return {
+    top: a,
+    right: b,
+    bottom: c,
+    left: d,
+  };
+}
+
+// 声明函数
+type LongHand = {
+  // 可以用于函数重载
+  (a: number): number;
+};
+
+type ShortHand = (a: number) => number;
+
+type allHand = {
+  (a: number): number;
+  (a: string): string;
+};
+
+// 可调用
+interface ReturnString {
+  (): string;
+}
+
+declare const of: ReturnString;
+const bar = of();
+
+// rest 参数
+interface Complex {
+  (foo: string, bar?: number, ...arg: boolean[]): number;
+}
+
+// 重载调用注解
+interface Over {
+  (foo: string): string;
+  (foo: number): number;
+}
+
+function sn(foo: number): number;
+function sn(foo: string): string;
+function sn(foo: any): any {
+  return typeof foo == 'number' ? foo ** 2 : `Hello ${foo}`;
+}
+
+const load: Over = sn;
+
+const st = load('zhenzhen');
+const nu = load(10);
+
+// 内联接口调用
+const loads: { (foo: string): string; (foo: number): number } = (foo: any) => foo;
+
+// 箭头函数（不能重载）
+const simple: (foo: string) => string = (foo) => foo.toString();
+
+// 可实例化
+interface CallNew {
+  new (): string;
+}
+
+declare const FP: CallNew;
+const fp = new FP();
