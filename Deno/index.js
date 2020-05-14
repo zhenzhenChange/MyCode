@@ -1,4 +1,4 @@
-console.log(Deno);
+console.log(Deno.args);
 
 const obj = {};
 obj.A = 10;

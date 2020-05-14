@@ -6,6 +6,21 @@
     <title>Document</title>
   </head>
   <body>
-    <script src="./You Don't Know JavaScript/022-高阶函数.js"></script>
+    <script>
+      // 不使用类似 for ， while 循环控制语句和 js 本身自带方法（如：forEach）的情况下，实现将一个空数组 [] 赋值成 [0,2,4,6,8,10,...,100] ，范围 0-100 便可。
+      const ary = [];
+      ary[0] = 0;
+
+      function evenAry(ary) {
+        ary[ary.length] = ary[ary.length - 1] + 2;
+
+        ary[ary.length - 1] < 100 && evenAry(ary);
+
+        return ary;
+      }
+
+      evenAry(ary);
+      console.log(ary);
+    </script>
   </body>
 </html>
