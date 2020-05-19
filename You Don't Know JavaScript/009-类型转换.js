@@ -56,7 +56,7 @@ function MyJSON(data) {
       });
 
       // 删除私有属性
-      delete newObj['toJSON'];
+      Reflect.deleteProperty(newObj, 'toJSON');
 
       return newObj;
     },
@@ -108,7 +108,7 @@ function MyJSON(data) {
 /*
  * 瑕疵：
  * 1.如果原本对象中的属性的值字符串含有 Symbol undefined function(){} Date类型的也会被反序列化；
- * 2.正则匹配有可能会出现误判，如第 2 点；
+ * 2.正则匹配有可能会出现误判，如第 1 点；
  * 3.Symbol 作为属性会产生一些问题
  *
  * TODO
