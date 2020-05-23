@@ -122,3 +122,39 @@
 // await Deno.rename('./aaa.ts', '../Array/bbb.ts'); // => 重命名并移动
 // Deno.renameSync('./aaa.ts', '../Array/bbb.ts'); // => 同步
 // console.log(Deno.resources()); // => 返回打开的文件资源 rid 及其字符串表示形式的 Map
+
+// console.log(Deno.run({ cmd: ['echo', 'zhenzhen'] })); // => 派生新的子进程，返回派生子进程的详细信息
+
+// Deno.test({ name: 'example', fn() {} }); // => 注册一个测试，使用命令 deno test 运行
+
+// const { rid } = Deno.openSync('./mod.ts');
+// Deno.setRaw(rid, true); // => 设置终端是否为 raw 模式
+
+// const listen = Deno.listen({ port: 3333 });
+// const conn = await listen.accept();
+// Deno.shutdown(conn.rid, Deno.ShutdownMode.Write); // => Shutdown 套接字的发送和接收操作
+
+// console.log(await Deno.stat('./mod.ts')); // => 解析给定 path，返回 Deno.FileInfo
+// console.log(Deno.statSync('./mod.ts')); // => 同步
+
+// await Deno.symlink('./mod.ts', '../Array/aaa.ts'); // => 创建 newPath 作为指向 oldPath 的符号链接
+// Deno.symlinkSync('./mod.ts', '../Array/aaa.ts'); // => 同步
+
+// const foo: string = 'foo';
+// console.log(await Deno.transpileOnly({ './mod.ts': `const foo: string = "foo"` })); // => 给定一组 TypeScript 类型的源码，返回解析后的映射
+
+// await Deno.truncate('./mod.ts', 1000); // => 通过指定的 len ，截取或者扩展指定的文件内容
+// Deno.truncateSync('./mod.ts', 1000); // => 同步
+
+// console.log(Deno.umask()); // => 此 API 未在 Windows 平台实现
+
+// await Deno.utime('./mod.ts', 1556495550, new Date()); // => 基于文件系统的 path 改变访问 (atime) 和修改 (mtime) 的时间
+// Deno.utimeSync('./mod.ts', 1556495550, new Date()); // => 同步
+
+/* 拒绝访问
+  const encoder = new TextEncoder();
+  const data = encoder.encode('Hello zhenzhen');
+  const file = await Deno.open('./aaa.txt');
+  const write = await Deno.write(file.rid, data);
+  Deno.close(file.rid); 
+*/
