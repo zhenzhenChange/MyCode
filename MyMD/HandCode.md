@@ -1313,3 +1313,31 @@ console.log(ary);
 3，第一秒先执行 a，3 秒后执行 b，但是 c 却是每间隔 3 秒执行一次，d 是每间隔 4 秒执行一次，a 和 b 是每 4 秒进行一次循环；
 
 4，a 不执行，b 和 c 每间隔 3 秒执行一次，d 不执行；
+
+## 原生实现两个大数加减乘除
+
+```js
+function addMaxNum(num1, num2, action) {
+  return Number(eval(`${BigInt(num1)}${action}${BigInt(num2)}`));
+}
+console.log(addMaxNum('9997492547350994', '9997399254750995', '+').toLocaleString());
+```
+
+## 递归思想
+
+```js
+// 不使用类似 for ， while 循环控制语句和 js 本身自带方法（如：forEach）的情况下，实现将一个空数组 [] 赋值成 [0,2,4,6,8,10,...,100] ，范围 0-100 便可。
+const ary = [];
+ary[0] = 0;
+
+function evenAry(ary) {
+  ary[ary.length] = ary[ary.length - 1] + 2;
+
+  ary[ary.length - 1] < 100 && evenAry(ary);
+
+  return ary;
+}
+
+evenAry(ary);
+console.log(ary);
+```

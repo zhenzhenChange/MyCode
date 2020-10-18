@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      a = 100;
+      function demo(e) {
+        function e() {}
+        arguments[0] = 2;
+        console.log('e', e); // 2
+
+        if (false) {
+          var b = 123;
+          function c() {}
+          var n = 2;
+        }
+
+        var d;
+        function d() {}
+        console.log('d', d); // undefined
+
+        var c;
+        a = 10;
+        var a;
+        console.log('b', b); // undefined
+        f = 123;
+        console.log('c', c); // undefined
+        console.log('a', a); // 10
+        console.log('n', n); // undefined
+      }
+      var a;
+      demo(1);
+      console.log('ga', a); // 100
+      console.log('f', f); // 123
+    </script>
+  </body>
+</html>
